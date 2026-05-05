@@ -1,4 +1,4 @@
-import Document, {
+import {
   Html,
   Head,
   Main,
@@ -6,23 +6,14 @@ import Document, {
 } from 'next/document';
 import styles from '../components/styles';
 
-class MyDocument extends Document {
-  static async getInitialProps(ctx) {
-    const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps };
-  }
-
-  render() {
-    return (
-      <Html>
-        <Head />
-        <body style={styles.body}>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    );
-  }
+export default function Document() {
+  return (
+    <Html>
+      <Head />
+      <body style={styles.body}>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
 }
-
-export default MyDocument;

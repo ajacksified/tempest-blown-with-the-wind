@@ -7,26 +7,19 @@ import FlightInfo from './flightInfo';
 /* eslint react/jsx-props-no-spreading: 0 */
 
 export default function Activity({ activity }) {
-  let previousFlight = 0;
+  const flightNumbers = activity.map((a) => (((a.sqnSlot - 1) / 4) >> 0) + 1);
 
   return (
     <Card>
-      {/* flight info here as part of the map, above the first person from each flight */}
-
-      {activity.map((a) => {
-        const currentFlightIndex = previousFlight;
-        previousFlight = (((a.sqnSlot - 1)/4) >> 0) + 1;
+      {activity.map((a, i) => {
+        const flight = flightNumbers[i];
+        const prevFlight = i > 0 ? flightNumbers[i - 1] : 0;
 
         return (
           <Fragment key={a.PIN}>
-            { previousFlight !== currentFlightIndex && currentFlightIndex > 0 && <Card />}
-            {
-              previousFlight !== currentFlightIndex && (
-                <FlightInfo flight={currentFlightIndex + 1} />
-              )
-            }
-
-            <PilotActivity {...a} key={a.PIN} />
+            {flight !== prevFlight && prevFlight > 0 && <Card />}
+            {flight !== prevFlight && <FlightInfo flight={flight} />}
+            <PilotActivity {...a} />
           </Fragment>
         );
       })}

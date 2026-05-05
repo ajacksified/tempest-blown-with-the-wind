@@ -2,7 +2,7 @@ import React from 'react';
 import Link from './link';
 import styles from './styles';
 
-export default {
+const activityItem = {
   BATTLE_COMPLETED: (battles) => (
     <React.Fragment key="BATTLE_COMPLETED">
       <dt style={styles.dt}>Completed Battles:</dt>
@@ -154,3 +154,5 @@ export default {
     </>
   ),
 };
+
+export default activityItem;

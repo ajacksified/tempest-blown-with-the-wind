@@ -175,6 +175,7 @@ const SITLEntry = ({ name, image, place = "Runner Up" }) => (
 
     <img
       src={`/competitions/stay-in-the-lines/2020-12/${image}`}
+      alt={name}
       width="100%"
     />
   </>

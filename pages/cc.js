@@ -1,3 +1,5 @@
+/* eslint react/no-unescaped-entities: 0 */
+
 function PL({ pin, children, value }) {
   return (
     <>

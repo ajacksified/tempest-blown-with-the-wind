@@ -87,7 +87,7 @@ const rankBadge = {
   paddingRight: '0.5em',
 };
 
-export default {
+const styles = {
   h1,
   h2,
   h3,
@@ -104,3 +104,5 @@ export default {
   highlightedLink,
   rankBadge,
 };
+
+export default styles;
