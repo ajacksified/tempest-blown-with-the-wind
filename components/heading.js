@@ -1,38 +1,42 @@
 import T from 'prop-types';
-import Card from './card';
 import styles from './styles';
 import config from '../config';
 
-// TODO: locally host banner image
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export default function Heading({ reportNumber }) {
+function formatDate(iso) {
+  const [year, month, day] = iso.split('-');
+  return `${parseInt(day, 10)} ${MONTHS[parseInt(month, 10) - 1]} ${year}`;
+}
+
+export default function Heading({ reportNumber, submissionDate, statusLine }) {
   return (
-    <Card>
-      <center>
-        <h3 style={styles.h3}>{config.ship}</h3>
-        <h1 style={styles.h1}>{`${config.squadron} Squadron`}</h1>
-
-        <h2
-          style={{
-            ...styles.h2,
-            marginTop: '1em',
-            marginBottom: '1em',
-            fontStyle: 'italic',
-          }}
-        >
-          {config.reportTitleFormat(reportNumber)}
-        </h2>
-
-        <img
-          alt="Tempest Banner"
-          style={{ width: '100%' }}
-          src={config.squadronBanner.url}
-        />
-      </center>
-    </Card>
+    <header style={styles.header}>
+      <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '.08em', fontSize: '.8rem', opacity: 0.7, color: styles.green }}>
+        {`${config.squadron} Squadron Report`}
+      </p>
+      <h1 style={styles.h1}>{config.reportTitleFormat(reportNumber)}</h1>
+      <p style={{ margin: '.25rem 0', opacity: 0.85 }}>
+        {'Submitted by '}
+        <strong>{config.cmdr.title}</strong>
+        {submissionDate && (
+          <> · <time dateTime={submissionDate}>{formatDate(submissionDate)}</time></>
+        )}
+      </p>
+      {statusLine && (
+        <p style={{ margin: '.75rem 0 0', fontSize: '.85rem', opacity: 0.75 }}>{statusLine}</p>
+      )}
+    </header>
   );
 }
 
 Heading.propTypes = {
   reportNumber: T.number.isRequired,
+  submissionDate: T.string,
+  statusLine: T.string,
+};
+
+Heading.defaultProps = {
+  submissionDate: null,
+  statusLine: null,
 };

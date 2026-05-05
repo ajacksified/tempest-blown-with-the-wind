@@ -2,21 +2,20 @@ import T from 'prop-types';
 import config from '../config';
 import styles from './styles';
 
-export default function FlightInfo({
-  flight: flightNumber,
-}) {
+export default function FlightInfo({ flight: flightNumber }) {
   const flight = config.flights[flightNumber - 1];
 
   return (
     <>
+      <h3 id={`flight-${flightNumber}-heading`} style={styles.h3}>
+        {`Flight ${flightNumber}: ${flight.name}`}
+      </h3>
       <img
-        alt={`Flight ${flight} ship`}
+        alt={`Flight ${flightNumber} ship`}
         src={`https://tc.emperorshammer.org/images/craft/${flight.ship}.png`}
-        style={{ float: 'right', maxWidth: 200 }}
+        style={{ float: 'right', maxWidth: 200, marginLeft: '1rem' }}
       />
-
-      <h2>{`Flight ${flightNumber}: ${flight.name}`}</h2>
-      <p style={styles.p}><em>{flight.motto}</em></p>
+      <p style={{ ...styles.p, fontStyle: 'italic', opacity: 0.8 }}>{flight.motto}</p>
     </>
   );
 }

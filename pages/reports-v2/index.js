@@ -3,18 +3,18 @@ import { useState, useCallback, useRef } from 'react';
 import T from 'prop-types';
 
 import Heading from '../../components/heading';
-import ReportDates from '../../components/report-dates';
+import Nav from '../../components/Nav';
+import Recognition from '../../components/Recognition';
 import Competitions from '../../components/competitions';
 import Citations from '../../components/citations';
 import Orders from '../../components/orders';
 import Closing from '../../components/closing';
 import Footer from '../../components/footer';
-import Card from '../../components/card';
 import EditableText from '../../components/EditableText';
+import ConfigEditor from '../../components/ConfigEditor';
 import styles from '../../components/styles';
 import config from '../../config';
 import { rankImages, ranks } from '../../components/ranks';
-import MedalCase from '../../components/medalCase';
 import Link from '../../components/link';
 import FlightInfo from '../../components/flightInfo';
 
@@ -23,66 +23,33 @@ import FlightInfo from '../../components/flightInfo';
 // ---------------------------------------------------------------------------
 
 const DEFAULT_REPORT_NUMBER = 39;
-const DEFAULT_START_DATE = '2021-05-31';
-const DEFAULT_END_DATE = '2021-06-13';
-const DEFAULT_SUBMISSION_DATE = '2021-06-13';
+
+function isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+const _today = new Date();
+const _yesterday = new Date(_today); _yesterday.setDate(_today.getDate() - 1);
+const _eightDaysAgo = new Date(_today); _eightDaysAgo.setDate(_today.getDate() - 8);
+
+const DEFAULT_START_DATE = isoDate(_eightDaysAgo);
+const DEFAULT_END_DATE = isoDate(_yesterday);
+const DEFAULT_SUBMISSION_DATE = isoDate(_today);
 
 const DEFAULT_CITATIONS = [
-  'TIE-TC 12',
-  'TIE-TC 76',
-  'TIE-TC 168',
-  'XWA-TC 8',
-  'XWA-TC 22',
 ];
 
 const DEFAULT_CITATIONS_CHANGE = '+0';
 
 const DEFAULT_ORDERS = [
   { name: 'TIE-TC 1', id: 1, title: 'Capture of Zaarin' },
-  { name: 'TIE-TC 10', id: 10, title: 'Battle for the Death Star' },
-  { name: 'TIE-TC 16', id: 16, title: 'Dacian Downfall' },
-  { name: 'TIE-TC 19', id: 19, title: 'The Tethys Honeymoon' },
-  { name: 'TIE-TC 30', id: 30, title: 'Save the Emperors Archives' },
-  { name: 'TIE-TC 153', id: 390, title: 'Koph Supremacy Project' },
 ];
 
 const DEFAULT_COMPETITIONS = [
-  {
-    id: '3269',
-    name: 'Tempest Raid Nights',
-    ends: '2021-06-15',
-    units: 'Tempest Squadron',
-    notes: 'Every week on Monday and Tuesday, Tempest will assemble for both PvE/Co-Op and PvP matches on Star Wars Squadrons.',
-    highlight: true,
-  },
-  {
-    id: '3278',
-    name: 'Tempest King of the Mountain',
-    ends: '2021-06-12',
-    units: 'Tempest Squadron',
-    notes: 'LCM Wreckage is hosting a 1v1 tournament for Tempest pilots',
-    highlight: true,
-  },
-  {
-    id: '3266',
-    name: 'Trivia Grand Tour: Season Six',
-    ends: '2021-07-26',
-    units: 'Entire TC',
-    notes: '',
-    highlight: false,
-  },
-  {
-    id: '3258',
-    name: 'TIE Corps in Battle Season Three',
-    ends: '2021-06-30',
-    units: 'Entire TC',
-    notes: 'Complete the monthly battles to win as pilot, squadron, and ship.',
-    highlight: false,
-  },
 ];
 
 const DEFAULT_INTRO_HTML = '<p>Write your intro here.</p>';
-const DEFAULT_CLOSING_HTML = '<p>In service,<br />' + config.cmdr.title + '</p>';
+const DEFAULT_CLOSING_HTML = `<p>Fly, report, compete, and keep the storm moving.</p>`;
 const DEFAULT_ORDERS_NOTE_HTML = '<p>Top priority are the TCiB battles; besides those, these are some of the missions we\'re close to earning citations on.</p>';
 
 // ---------------------------------------------------------------------------
@@ -90,9 +57,6 @@ const DEFAULT_ORDERS_NOTE_HTML = '<p>Top priority are the TCiB battles; besides 
 // ---------------------------------------------------------------------------
 
 const toolbarStyle = {
-  position: 'sticky',
-  top: 0,
-  zIndex: 100,
   backgroundColor: '#1a1a2e',
   borderBottom: '2px solid #0095ff',
   padding: '0.75em 1em',
@@ -100,6 +64,34 @@ const toolbarStyle = {
   flexWrap: 'wrap',
   gap: '0.5em',
   alignItems: 'center',
+};
+
+// Breaks out of the 860px article constraint to use full viewport width
+const editorWrapStyle = {
+  position: 'relative',
+  left: '50%',
+  marginLeft: '-50vw',
+  width: '100vw',
+};
+
+const sidebarStyle = {
+  width: '280px',
+  flexShrink: 0,
+  position: 'sticky',
+  top: 0,
+  maxHeight: '100vh',
+  overflowY: 'auto',
+  backgroundColor: '#0d0d1a',
+  borderRight: '1px solid #333',
+  padding: '1rem',
+  fontSize: '13px',
+};
+
+const reportPaneStyle = {
+  flex: 1,
+  maxWidth: '860px',
+  padding: '1rem',
+  minWidth: 0,
 };
 
 const inputStyle = {
@@ -134,12 +126,17 @@ const successButton = {
 };
 
 const sectionFormStyle = {
-  backgroundColor: '#111122',
-  border: '1px dashed #555',
-  borderRadius: '4px',
-  padding: '0.75em 1em',
-  marginBottom: '0.5em',
-  fontSize: '14px',
+  marginBottom: '1.25rem',
+};
+
+const sidebarSectionHead = {
+  display: 'block',
+  color: '#0095ff',
+  fontWeight: 'bold',
+  marginBottom: '0.5rem',
+  fontSize: '13px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
 };
 
 const labelStyle = {
@@ -156,7 +153,6 @@ const labelStyle = {
 function EditablePilotActivity({ pilot, activity, onChange }) {
   const { PIN, name, rank } = pilot;
   const RankImage = rankImages[rank];
-  const { MEDALS_AWARDED: awardedMedals } = pilot.activity || {};
 
   function field(key, label) {
     return (
@@ -175,27 +171,26 @@ function EditablePilotActivity({ pilot, activity, onChange }) {
   }
 
   return (
-    <div>
-      {RankImage && <RankImage />}
-      <Link
-        href={`https://tc.emperorshammer.org/record.php?pin=${PIN}&type=profile`}
-        target="_blank"
-        rel="noreferrer"
-        style={{ position: 'relative', bottom: '7px' }}
-      >
-        <strong style={styles.h4}>
+    <article style={styles.pilotCard}>
+      <h4 style={styles.h4}>
+        {RankImage && <RankImage />}
+        <Link
+          href={`https://tc.emperorshammer.org/record.php?pin=${PIN}&type=profile`}
+          target="_blank"
+          rel="noreferrer"
+          style={{ position: 'relative', bottom: '7px' }}
+        >
           {`${ranks[rank] ? ranks[rank].toUpperCase() : rank} ${name}`}
-        </strong>
-      </Link>
+        </Link>
+      </h4>
 
-      <dl style={{ marginTop: '0', marginBottom: '1em' }}>
-        {field('communication', 'Communication:')}
-        {field('flightActivity', 'Flight Activity:')}
+      <dl style={{ marginTop: '0', marginBottom: '0' }}>
+        {field('communication', 'Comms:')}
+        {field('flightActivity', 'Activity:')}
         {field('otherActivity', 'Other:')}
         {field('notes', 'Notes:')}
-        {awardedMedals && <MedalCase medals={awardedMedals} />}
       </dl>
-    </div>
+    </article>
   );
 }
 
@@ -222,25 +217,30 @@ EditablePilotActivity.propTypes = {
 function EditableActivity({ activityData, pilotActivity, onPilotChange }) {
   if (!activityData.length) {
     return (
-      <Card>
+      <section id="activity" aria-labelledby="activity-heading" style={styles.sectionBlock}>
+        <p id="activity-heading" style={styles.sectionPrefix}>[CMDR] PILOT ACTIVITY LOG</p>
         <p style={{ ...styles.p, color: '#aaa', fontStyle: 'italic' }}>
-          Enter dates above and click "Load Data" to populate pilot activity.
+          Enter dates above and click &quot;Load Data&quot; to populate pilot activity.
         </p>
-      </Card>
+      </section>
     );
   }
 
   const flightNumbers = activityData.map((a) => (((a.sqnSlot - 1) / 4) >> 0) + 1);
 
   return (
-    <Card>
+    <section id="activity" aria-labelledby="activity-heading" style={styles.sectionBlock}>
+      <p id="activity-heading" style={styles.sectionPrefix}>[CMDR] PILOT ACTIVITY LOG</p>
       {activityData.map((pilot, i) => {
         const flight = flightNumbers[i];
         const prevFlight = i > 0 ? flightNumbers[i - 1] : 0;
         return (
           <div key={pilot.PIN}>
-            {flight !== prevFlight && prevFlight > 0 && <Card />}
-            {flight !== prevFlight && <FlightInfo flight={flight} />}
+            {flight !== prevFlight && (
+              <section aria-labelledby={`flight-${flight}-heading`}>
+                <FlightInfo flight={flight} />
+              </section>
+            )}
             <EditablePilotActivity
               pilot={pilot}
               activity={pilotActivity[pilot.PIN] || {}}
@@ -249,7 +249,7 @@ function EditableActivity({ activityData, pilotActivity, onPilotChange }) {
           </div>
         );
       })}
-    </Card>
+    </section>
   );
 }
 
@@ -277,22 +277,21 @@ function OrdersForm({ orders, onChange }) {
   }
 
   return (
-    <div data-editor-only="true" style={sectionFormStyle}>
-      <strong style={{ color: '#0095ff' }}>✏ Orders</strong>
-      <ul style={{ margin: '0.5em 0', paddingLeft: '1.2em' }}>
+    <div style={sectionFormStyle}>
+      <ul style={{ margin: '0 0 0.5em', paddingLeft: '1.2em' }}>
         {orders.map((o, i) => (
           <li key={o.id} style={{ marginBottom: '0.25em' }}>
             {o.name} — {o.title}
             {' '}
-            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.4em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
+            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.3em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
           </li>
         ))}
       </ul>
       <div style={{ display: 'flex', gap: '0.4em', flexWrap: 'wrap' }}>
-        <input style={{ ...inputStyle, width: '90px' }} placeholder="Name (e.g. TIE-TC 1)" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-        <input style={{ ...inputStyle, width: '60px' }} placeholder="ID" type="number" value={draft.id} onChange={(e) => setDraft({ ...draft, id: e.target.value })} />
-        <input style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
-        <button type="button" onClick={add} style={primaryButton}>+ Add</button>
+        <input style={{ ...inputStyle, width: '90px', fontSize: '12px' }} placeholder="TIE-TC 1" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+        <input style={{ ...inputStyle, width: '50px', fontSize: '12px' }} placeholder="ID" type="number" value={draft.id} onChange={(e) => setDraft({ ...draft, id: e.target.value })} />
+        <input style={{ ...inputStyle, flex: 1, minWidth: '120px', fontSize: '12px' }} placeholder="Title" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+        <button type="button" onClick={add} style={{ ...primaryButton, fontSize: '12px' }}>+ Add</button>
       </div>
     </div>
   );
@@ -321,28 +320,27 @@ function CompetitionsForm({ competitions, onChange }) {
   }
 
   return (
-    <div data-editor-only="true" style={sectionFormStyle}>
-      <strong style={{ color: '#0095ff' }}>✏ Competitions</strong>
-      <ul style={{ margin: '0.5em 0', paddingLeft: '1.2em' }}>
+    <div style={sectionFormStyle}>
+      <ul style={{ margin: '0 0 0.5em', paddingLeft: '1.2em' }}>
         {competitions.map((c, i) => (
           <li key={c.id} style={{ marginBottom: '0.25em' }}>
-            {c.highlight ? '★ ' : ''}{c.name} (until {c.ends}, {c.units})
+            {c.highlight ? '★ ' : ''}{c.name} (until {c.ends})
             {' '}
-            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.4em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
+            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.3em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
           </li>
         ))}
       </ul>
       <div style={{ display: 'flex', gap: '0.4em', flexWrap: 'wrap' }}>
-        <input style={{ ...inputStyle, width: '60px' }} placeholder="ID" value={draft.id} onChange={(e) => setDraft({ ...draft, id: e.target.value })} />
-        <input style={{ ...inputStyle, flex: 1, minWidth: '140px' }} placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
-        <input style={{ ...inputStyle, width: '100px' }} placeholder="YYYY-MM-DD" value={draft.ends} onChange={(e) => setDraft({ ...draft, ends: e.target.value })} />
-        <input style={{ ...inputStyle, width: '120px' }} placeholder="Units" value={draft.units} onChange={(e) => setDraft({ ...draft, units: e.target.value })} />
-        <input style={{ ...inputStyle, flex: 2, minWidth: '160px' }} placeholder="Notes (optional)" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
-        <label style={{ color: '#ccc', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <input style={{ ...inputStyle, width: '50px', fontSize: '12px' }} placeholder="ID" value={draft.id} onChange={(e) => setDraft({ ...draft, id: e.target.value })} />
+        <input style={{ ...inputStyle, flex: 1, minWidth: '120px', fontSize: '12px' }} placeholder="Name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+        <input style={{ ...inputStyle, width: '95px', fontSize: '12px' }} placeholder="YYYY-MM-DD" value={draft.ends} onChange={(e) => setDraft({ ...draft, ends: e.target.value })} />
+        <input style={{ ...inputStyle, width: '100px', fontSize: '12px' }} placeholder="Units" value={draft.units} onChange={(e) => setDraft({ ...draft, units: e.target.value })} />
+        <input style={{ ...inputStyle, flex: 2, minWidth: '120px', fontSize: '12px' }} placeholder="Notes (optional)" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
+        <label style={{ color: '#ccc', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <input type="checkbox" checked={draft.highlight} onChange={(e) => setDraft({ ...draft, highlight: e.target.checked })} />
-          Highlight
+          ★
         </label>
-        <button type="button" onClick={add} style={primaryButton}>+ Add</button>
+        <button type="button" onClick={add} style={{ ...primaryButton, fontSize: '12px' }}>+ Add</button>
       </div>
     </div>
   );
@@ -371,27 +369,28 @@ function CitationsForm({ citations, citationsChange, onCitationsChange, onChange
   }
 
   return (
-    <div data-editor-only="true" style={sectionFormStyle}>
-      <strong style={{ color: '#0095ff' }}>✏ Citations</strong>
-      <ul style={{ margin: '0.5em 0', paddingLeft: '1.2em' }}>
+    <div style={sectionFormStyle}>
+      <ul style={{ margin: '0 0 0.5em', paddingLeft: '1.2em' }}>
         {citations.map((c, i) => (
           <li key={c} style={{ marginBottom: '0.25em' }}>
             {c}
             {' '}
-            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.4em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
+            <button type="button" onClick={() => remove(i)} style={{ ...buttonStyle, padding: '0 0.3em', backgroundColor: '#550000', color: '#fff', fontSize: '11px' }}>✕</button>
           </li>
         ))}
       </ul>
       <div style={{ display: 'flex', gap: '0.4em', flexWrap: 'wrap', alignItems: 'center' }}>
-        <input style={{ ...inputStyle, flex: 1, minWidth: '160px' }} placeholder="e.g. TIE-TC 12" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') add(); }} />
-        <button type="button" onClick={add} style={primaryButton}>+ Add</button>
-        <span style={{ color: '#aaa', fontSize: '13px', marginLeft: '1em' }}>Change:</span>
-        <input
-          style={{ ...inputStyle, width: '60px' }}
-          placeholder="+0"
-          value={citationsChange}
-          onChange={(e) => onChangeChange(e.target.value)}
-        />
+        <input style={{ ...inputStyle, flex: 1, minWidth: '120px', fontSize: '12px' }} placeholder="e.g. TIE-TC 12" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') add(); }} />
+        <button type="button" onClick={add} style={{ ...primaryButton, fontSize: '12px' }}>+ Add</button>
+        <label style={{ color: '#aaa', fontSize: '12px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+          Δ
+          <input
+            style={{ ...inputStyle, width: '50px', fontSize: '12px' }}
+            placeholder="+0"
+            value={citationsChange}
+            onChange={(e) => onChangeChange(e.target.value)}
+          />
+        </label>
       </div>
     </div>
   );
@@ -417,6 +416,7 @@ export default function ReportEditorV2() {
   const [startDate, setStartDate] = useState(DEFAULT_START_DATE);
   const [endDate, setEndDate] = useState(DEFAULT_END_DATE);
   const [submissionDate, setSubmissionDate] = useState(DEFAULT_SUBMISSION_DATE);
+  const [statusLine, setStatusLine] = useState('');
 
   // Prose sections
   const [introHtml, setIntroHtml] = useState(DEFAULT_INTRO_HTML);
@@ -509,9 +509,9 @@ export default function ReportEditorV2() {
   // -------------------------------------------------------------------------
 
   return (
-    <>
-      {/* Toolbar — excluded from copy */}
-      <div data-editor-only="true" style={toolbarStyle}>
+    <div style={editorWrapStyle}>
+      {/* Sticky toolbar — full width */}
+      <div data-editor-only="true" style={{ position: 'sticky', top: 0, zIndex: 100, ...toolbarStyle }}>
         <span style={{ color: '#0095ff', fontWeight: 'bold', marginRight: '0.5em' }}>
           ✏ Report Editor
         </span>
@@ -541,6 +541,17 @@ export default function ReportEditorV2() {
           <input type="date" value={submissionDate} onChange={(e) => setSubmissionDate(e.target.value)} style={{ ...inputStyle, marginLeft: '4px' }} />
         </label>
 
+        <label style={labelStyle}>
+          Status
+          <input
+            type="text"
+            value={statusLine}
+            onChange={(e) => setStatusLine(e.target.value)}
+            placeholder="optional status note"
+            style={{ ...inputStyle, width: '200px', marginLeft: '4px' }}
+          />
+        </label>
+
         <button type="button" onClick={loadData} disabled={loading} style={primaryButton}>
           {loading ? 'Loading…' : 'Load Data'}
         </button>
@@ -554,66 +565,256 @@ export default function ReportEditorV2() {
         </button>
       </div>
 
-      {/* Report content — this is what gets copied */}
-      <div ref={reportContentRef}>
-        <Heading reportNumber={reportNumber} />
+      {/* Body: sidebar + report */}
+      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
 
-        <ReportDates
-          startDate={startDate}
-          endDate={endDate}
-          submissionDate={submissionDate}
-        />
+        {/* Left sidebar — all editor forms, excluded from copy */}
+        <div data-editor-only="true" style={sidebarStyle}>
+          <ConfigEditor />
 
-        {/* Intro */}
-        <Card>
-          <h5 style={{ ...styles.h5, marginBottom: '1em' }}>{config.cmdr.intro}</h5>
-          <a
-            href={`https://tc.emperorshammer.org/record.php?pin=${config.cmdr.pin}&type=profile`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img
-              style={{ width: '100%', maxWidth: '190px', float: 'right' }}
-              src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
-              alt={`The uniform of ${config.cmdr.name}`}
-            />
-          </a>
-          <EditableText value={introHtml} onChange={setIntroHtml} />
-        </Card>
+          <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
 
-        {/* Orders */}
-        <OrdersForm orders={orders} onChange={setOrders} />
-        <Orders missions={orders}>
-          <EditableText value={ordersNoteHtml} onChange={setOrdersNoteHtml} />
-        </Orders>
+          <span style={sidebarSectionHead}>Orders</span>
+          <OrdersForm orders={orders} onChange={setOrders} />
 
-        {/* Activity */}
-        <EditableActivity
-          activityData={activityData}
-          pilotActivity={pilotActivity}
-          onPilotChange={handlePilotChange}
-        />
+          <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
 
-        {/* Competitions */}
-        <CompetitionsForm competitions={competitions} onChange={setCompetitions} />
-        <Competitions competitions={competitions} />
+          <span style={sidebarSectionHead}>Competitions</span>
+          <CompetitionsForm competitions={competitions} onChange={setCompetitions} />
 
-        {/* Citations */}
-        <CitationsForm
-          citations={citations}
-          citationsChange={citationsChange}
-          onCitationsChange={setCitations}
-          onChangeChange={setCitationsChange}
-        />
-        <Citations citations={citations} citationsChange={citationsChange} />
+          <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
 
-        {/* Closing */}
-        <Closing>
-          <EditableText value={closingHtml} onChange={setClosingHtml} />
-        </Closing>
+          <span style={sidebarSectionHead}>
+            Citations
+            <span style={{ fontWeight: 'normal', opacity: 0.7, marginLeft: '0.5em' }}>(Δ count)</span>
+          </span>
+          <CitationsForm
+            citations={citations}
+            citationsChange={citationsChange}
+            onCitationsChange={setCitations}
+            onChangeChange={setCitationsChange}
+          />
+        </div>
 
-        <Footer />
+        {/* Report content — this is what gets copied */}
+        <div ref={reportContentRef} style={reportPaneStyle} className="crt">
+          <style>
+            {`
+            @keyframes flicker {
+              0% {
+                opacity: 0.27861;
+              }
+              5% {
+                opacity: 0.34769;
+              }
+              10% {
+                opacity: 0.23604;
+              }
+              15% {
+                opacity: 0.90626;
+              }
+              20% {
+                opacity: 0.18128;
+              }
+              25% {
+                opacity: 0.83891;
+              }
+              30% {
+                opacity: 0.65583;
+              }
+              35% {
+                opacity: 0.67807;
+              }
+              40% {
+                opacity: 0.26559;
+              }
+              45% {
+                opacity: 0.84693;
+              }
+              50% {
+                opacity: 0.96019;
+              }
+              55% {
+                opacity: 0.08594;
+              }
+              60% {
+                opacity: 0.20313;
+              }
+              65% {
+                opacity: 0.71988;
+              }
+              70% {
+                opacity: 0.53455;
+              }
+              75% {
+                opacity: 0.37288;
+              }
+              80% {
+                opacity: 0.71428;
+              }
+              85% {
+                opacity: 0.70419;
+              }
+              90% {
+                opacity: 0.7003;
+              }
+              95% {
+                opacity: 0.36108;
+              }
+              100% {
+                opacity: 0.24387;
+              }
+            }
+            @keyframes textShadow {
+              0% {
+                text-shadow: 0.4389924193300864px 0 1px rgba(0,30,255,0.5), -0.4389924193300864px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              5% {
+                text-shadow: 2.7928974010788217px 0 1px rgba(0,30,255,0.5), -2.7928974010788217px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              10% {
+                text-shadow: 0.02956275843481219px 0 1px rgba(0,30,255,0.5), -0.02956275843481219px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              15% {
+                text-shadow: 0.40218538552878136px 0 1px rgba(0,30,255,0.5), -0.40218538552878136px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              20% {
+                text-shadow: 3.4794037899852017px 0 1px rgba(0,30,255,0.5), -3.4794037899852017px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              25% {
+                text-shadow: 1.6125630401149584px 0 1px rgba(0,30,255,0.5), -1.6125630401149584px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              30% {
+                text-shadow: 0.7015590085143956px 0 1px rgba(0,30,255,0.5), -0.7015590085143956px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              35% {
+                text-shadow: 3.896914047650351px 0 1px rgba(0,30,255,0.5), -3.896914047650351px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              40% {
+                text-shadow: 3.870905614848819px 0 1px rgba(0,30,255,0.5), -3.870905614848819px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              45% {
+                text-shadow: 2.231056963361899px 0 1px rgba(0,30,255,0.5), -2.231056963361899px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              50% {
+                text-shadow: 0.08084290417898504px 0 1px rgba(0,30,255,0.5), -0.08084290417898504px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              55% {
+                text-shadow: 2.3758461067427543px 0 1px rgba(0,30,255,0.5), -2.3758461067427543px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              60% {
+                text-shadow: 2.202193051050636px 0 1px rgba(0,30,255,0.5), -2.202193051050636px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              65% {
+                text-shadow: 2.8638780614874975px 0 1px rgba(0,30,255,0.5), -2.8638780614874975px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              70% {
+                text-shadow: 0.48874025155497314px 0 1px rgba(0,30,255,0.5), -0.48874025155497314px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              75% {
+                text-shadow: 1.8948491305757957px 0 1px rgba(0,30,255,0.5), -1.8948491305757957px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              80% {
+                text-shadow: 0.0833037308038857px 0 1px rgba(0,30,255,0.5), -0.0833037308038857px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              85% {
+                text-shadow: 0.09769827255241735px 0 1px rgba(0,30,255,0.5), -0.09769827255241735px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              90% {
+                text-shadow: 3.443339761481782px 0 1px rgba(0,30,255,0.5), -3.443339761481782px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              95% {
+                text-shadow: 2.1841838852799786px 0 1px rgba(0,30,255,0.5), -2.1841838852799786px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+              100% {
+                text-shadow: 2.6208764473832513px 0 1px rgba(0,30,255,0.5), -2.6208764473832513px 0 1px rgba(255,0,80,0.3), 0 0 3px;
+              }
+            }
+            .crt::after {
+              content: " ";
+              display: block;
+              position: absolute;
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              background: rgba(18, 16, 16, 0.1);
+              opacity: 0;
+              z-index: 2;
+              pointer-events: none;
+              animation: flicker 0.15s infinite;
+            }
+            .crt::before {
+              content: " ";
+              display: block;
+              position: absolute;
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+              background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+              z-index: 2;
+              background-size: 100% 2px, 3px 100%;
+              pointer-events: none;
+            }
+            .crt {
+              animation: textShadow 1.6s infinite;
+            }
+            `}
+          </style>
+          <Heading
+            reportNumber={reportNumber}
+            submissionDate={submissionDate}
+            statusLine={statusLine || null}
+          />
+
+          <Nav />
+
+          {/* Intro */}
+          <section id="transmission" aria-labelledby="transmission-heading" style={styles.sectionBlock}>
+            <p id="transmission-heading" style={styles.sectionPrefix}>[COMM] TRANSMISSION // PRIORITY: ROUTINE</p>
+            <a
+              href={`https://tc.emperorshammer.org/record.php?pin=${config.cmdr.pin}&type=profile`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
+                src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
+                alt={`The uniform of ${config.cmdr.name}`}
+              />
+            </a>
+            <EditableText value={introHtml} onChange={setIntroHtml} />
+          </section>
+
+          {/* Orders */}
+          <Orders missions={orders}>
+            <EditableText value={ordersNoteHtml} onChange={setOrdersNoteHtml} />
+          </Orders>
+
+          {/* Recognition — promotions + medals extracted from activityData */}
+          <Recognition activityData={activityData} />
+
+          {/* Activity */}
+          <EditableActivity
+            activityData={activityData}
+            pilotActivity={pilotActivity}
+            onPilotChange={handlePilotChange}
+          />
+
+          {/* Competitions */}
+          <Competitions competitions={competitions} />
+
+          {/* Citations */}
+          <Citations citations={citations} citationsChange={citationsChange} />
+
+          {/* Resources then closing signal */}
+          <Footer />
+          <Closing>
+            <EditableText value={closingHtml} onChange={setClosingHtml} />
+          </Closing>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

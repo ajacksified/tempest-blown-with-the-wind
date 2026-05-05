@@ -1,16 +1,20 @@
 import T from 'prop-types';
-import Card from './card';
 import styles from './styles';
+import config from '../config';
 
 export default function Closing({ children }) {
   return (
-    <Card>
-      <h5 style={styles.h5}>
-        In Closing
-      </h5>
-
+    <footer style={styles.footer}>
+      <p style={styles.sectionPrefix}>[COMM] CLOSING SIGNAL</p>
       {children}
-    </Card>
+      <p style={{ marginTop: '1rem' }}>
+        {`— ${config.cmdr.title}`}
+        <br />
+        <span style={{ color: styles.green }}>
+          {'>> TRANSMISSION COMPLETE'}
+        </span>
+      </p>
+    </footer>
   );
 }
 

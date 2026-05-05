@@ -5,17 +5,9 @@ import styles from '../components/styles';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <table style={styles.body}>
-      <tbody>
-        <tr style={styles.body}>
-          <td style={styles.body}>
-            <div style={styles.body}>
-              <Component {...pageProps} />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <article style={styles.article}>
+      <Component {...pageProps} />
+    </article>
   );
 }
 

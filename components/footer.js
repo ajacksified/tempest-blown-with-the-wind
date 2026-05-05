@@ -1,5 +1,4 @@
 import T from 'prop-types';
-import Card from './card';
 import Link from './link';
 import styles from './styles';
 import config from '../config';
@@ -26,33 +25,17 @@ const links = [{
 
 export default function Footer({ children }) {
   return (
-    <Card style={{ borderBottom: 0 }}>
-      <h5 style={{ ...styles.h5, marginBottom: '1em' }}>
-        Resources
-      </h5>
-
-      <img
-        style={{ width: '182px', float: 'right' }}
-        src="https://tempest-blown-with-the-wind.vercel.app/tc.png"
-        alt="The TIE Corps logo"
-      />
-
-      <ul>
+    <section style={{ ...styles.sectionBlock, opacity: 0.8 }}>
+      <p style={styles.sectionPrefix}>[IU] RESOURCES</p>
+      <ul style={styles.list}>
         {links.map(({ href, title }) => (
-          <li key={href}>
-            <Link
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {title}
-            </Link>
+          <li key={href} style={styles.listItem}>
+            <Link href={href} target="_blank" rel="noreferrer" style={styles.listItemLink}>{title}</Link>
           </li>
         ))}
       </ul>
-
       {children}
-    </Card>
+    </section>
   );
 }
 

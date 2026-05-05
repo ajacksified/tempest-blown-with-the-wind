@@ -1,21 +1,22 @@
 import T from 'prop-types';
-import Card from './card';
 import Link from './link';
 import styles from './styles';
 import config from '../config';
 
 export default function Citations({ citations, citationsChange, children }) {
   return (
-    <Card>
-      <h5 style={styles.h5}>
-        {`Squadron Citations: ${citations.length} (${citationsChange})`}
-      </h5>
+    <section id="citations" aria-labelledby="citations-heading" style={styles.sectionBlock}>
+      <p id="citations-heading" style={styles.sectionPrefix}>[TAC] SQUADRON CITATION RECORD</p>
 
-      <ul>
-        {citations.map((c) => <li key={c}>{c}</li>) }
+      <p style={styles.p}>
+        <strong>{`Current Citations: ${citations.length} (${citationsChange})`}</strong>
+      </p>
+
+      <ul style={styles.list}>
+        {citations.map((c) => <li key={c} style={styles.listItem}>{c}</li>)}
       </ul>
 
-      { children }
+      {children}
 
       <p style={styles.p}>
         <Link
@@ -26,7 +27,7 @@ export default function Citations({ citations, citationsChange, children }) {
           View Squadron Battleboard
         </Link>
       </p>
-    </Card>
+    </section>
   );
 }
 
