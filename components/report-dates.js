@@ -7,9 +7,6 @@ export default function Dates({
   startDate,
   endDate,
   submissionDate,
-  to,
-  cc,
-  from,
 }) {
   return (
     <Card>
@@ -22,17 +19,17 @@ export default function Dates({
 
       <p styles={styles.p}>
         <strong>From:</strong>
-        {` ${from}`}
+        {` ${config.cmdr.name}`}
 
         <br />
 
         <strong>To:</strong>
-        {` ${to}`}
+        {` ${config.wc.name}`}
 
         <br />
 
         <strong>CC:</strong>
-        {` ${cc}`}
+        {` ${config.com.name}`}
 
         <br />
 

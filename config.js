@@ -1,4 +1,4 @@
-export default {
+const config = {
   reportTitleFormat: (number) => `Blown with the Wind #${number}`,
   ship: 'ISD-II Challenge',
   squadron: 'Tempest',
@@ -44,3 +44,5 @@ export default {
     ship: 31,
   }],
 };
+
+export default config;
