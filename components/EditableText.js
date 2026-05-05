@@ -23,7 +23,6 @@ export default function EditableText({ value, onChange, style, placeholder }) {
       onInput={() => onChange(ref.current.innerHTML)}
       style={{
         outline: 'none',
-        borderLeft: '2px solid #555',
         paddingLeft: '0.5em',
         minHeight: '1em',
         ...style,

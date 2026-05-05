@@ -48,7 +48,7 @@ const sectionPrefix = {
 const pilotCard = {
   margin: '1rem 0',
   padding: '1rem',
-  border: '1px solid currentColor',
+  border: '1px solid #333',
 };
 
 const promotionCard = {
@@ -96,6 +96,16 @@ const listItemLink = {
   textDecoration: 'none',
 };
 
+const listItemLabel = {
+  color: white,
+  display: 'inline-block',
+  fontSize: '0.85rem',
+  padding: '0.15rem 0.35rem',
+  backgroundColor: '#333',
+  borderRadius: 1,
+  textDecoration: 'none',
+};
+
 const styles = {
   body,
   article,
@@ -110,7 +120,7 @@ const styles = {
   p, a, dt, dd,
   card, highlighted, highlightedLink, rankBadge,
   red, green, black, white,
-  list, listItem, listItemLink,
+  list, listItem, listItemLink, listItemLabel
 };
 
 export default styles;

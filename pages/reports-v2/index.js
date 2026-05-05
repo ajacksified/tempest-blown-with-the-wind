@@ -92,6 +92,9 @@ const reportPaneStyle = {
   maxWidth: '860px',
   padding: '1rem',
   minWidth: 0,
+  fontFamily: 'Monospace',
+  backgroundColor: '#000000',
+  color: '#ffffff',
 };
 
 const inputStyle = {
@@ -157,15 +160,16 @@ function EditablePilotActivity({ pilot, activity, onChange }) {
   function field(key, label) {
     return (
       <div style={{ marginBottom: '0.25em' }}>
-        <dt style={styles.dt}>{label}</dt>
+        <dt style={{ display: 'inline', ...styles.listItemLabel }}>{label}</dt>
         <dd
-          style={{ ...styles.dd, outline: 'none', borderLeft: '2px solid #555', paddingLeft: '0.4em' }}
+          style={{ ...styles.dd, outline: 'none', paddingLeft: '0.4em', display: 'inline' }}
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => onChange(PIN, key, e.currentTarget.textContent)}
         >
           {activity[key] || ''}
         </dd>
+        <br />
       </div>
     );
   }
@@ -185,10 +189,9 @@ function EditablePilotActivity({ pilot, activity, onChange }) {
       </h4>
 
       <dl style={{ marginTop: '0', marginBottom: '0' }}>
-        {field('communication', 'Comms:')}
-        {field('flightActivity', 'Activity:')}
-        {field('otherActivity', 'Other:')}
-        {field('notes', 'Notes:')}
+        {field('communication', 'Comms')}
+        {field('flightActivity', 'Activity')}
+        {field('notes', 'Notes')}
       </dl>
     </article>
   );
@@ -204,7 +207,6 @@ EditablePilotActivity.propTypes = {
   activity: T.shape({
     communication: T.string,
     flightActivity: T.string,
-    otherActivity: T.string,
     notes: T.string,
   }).isRequired,
   onChange: T.func.isRequired,
@@ -465,7 +467,7 @@ export default function ReportEditorV2() {
         const next = { ...prev };
         merged.forEach(({ PIN }) => {
           if (!next[PIN]) {
-            next[PIN] = { communication: '', flightActivity: '', otherActivity: '', notes: '' };
+            next[PIN] = { communication: '', flightActivity: '', notes: '' };
           }
         });
         return next;
@@ -498,7 +500,7 @@ export default function ReportEditorV2() {
     node.querySelectorAll('[contenteditable]').forEach((el) => {
       el.removeAttribute('contenteditable');
     });
-    navigator.clipboard.writeText(node.innerHTML).then(() => {
+    navigator.clipboard.writeText(node.outerHTML).then(() => {
       setCopyLabel('Copied!');
       setTimeout(() => setCopyLabel('Copy HTML'), 2000);
     });
