@@ -258,8 +258,7 @@ export default function ConfigEditor() {
 
               {/* People */}
               <PersonSection label="CMDR" data={config.cmdr} onChange={(v) => set('cmdr', v)} />
-              <PersonSection label="Wing Commander" data={config.wc} onChange={(v) => set('wc', v)} />
-              <PersonSection label="Commodore" data={config.com} onChange={(v) => set('com', v)} />
+              <PersonSection label="Battlegroup Commander" data={config.com} onChange={(v) => set('com', v)} />
 
               {/* Flights */}
               <FlightsSection flights={config.flights} onChange={(v) => set('flights', v)} />

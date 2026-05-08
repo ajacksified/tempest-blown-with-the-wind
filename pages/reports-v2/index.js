@@ -22,7 +22,7 @@ import FlightInfo from '../../components/flightInfo';
 // Default state seeded from report 38
 // ---------------------------------------------------------------------------
 
-const DEFAULT_REPORT_NUMBER = 39;
+const DEFAULT_REPORT_NUMBER = 0;
 
 function isoDate(d) {
   return d.toISOString().slice(0, 10);

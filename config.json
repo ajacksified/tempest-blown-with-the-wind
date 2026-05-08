@@ -1,5 +1,5 @@
 {
-  "reportTitleFormat": "Blown with the Wind #{{number}}",
+  "reportTitleFormat": "Tempestuous Transmission #{{number}}",
   "ship": "ISD-II Challenge",
   "squadron": "Tempest",
   "squadronId": "45",
@@ -16,19 +16,14 @@
   "cmdr": {
     "intro": "From the Desk of Silwar Naiilo",
     "name": "Silwar Naiilo",
-    "title": "COL Silwar Naiilo",
+    "title": "GN Silwar Naiilo",
     "pin": 12630,
     "email": "ehsilwar@gmail.com"
   },
-  "wc": {
-    "name": "Denys Elara",
-    "title": "LC Denys Elara",
-    "pin": 21086
-  },
   "com": {
-    "name": "Anahorn Dempsey",
-    "title": "HA Anahorn Dempsey",
-    "pin": 12945
+    "name": "Locke Setzer",
+    "title": "AD Locke Setzer",
+    "pin": 4541
   },
   "flights": [
     {
@@ -38,13 +33,13 @@
     },
     {
       "name": "Heralds of Maelstrom",
-      "motto": "The brightest thunderbolt is elicited from the darkest storm",
-      "ship": 31
+      "motto": "Hell is empty, and all the devils are here",
+      "ship": 249
     },
     {
       "name": "Paladins of Fulmination",
       "motto": "You'll see the lightning but will be dead before the thunder",
-      "ship": 31
+      "ship": 249
     }
   ]
 }
