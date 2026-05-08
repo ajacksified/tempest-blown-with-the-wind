@@ -25,10 +25,10 @@ const PLAYER_ART = [
 
 // ── Projectile speeds (cells/tick) ───────────────────────────────────────────
 const BULLET_SPEED        = 2;
-const PLAYER_MISSILE_SPEED = 1;
+const PLAYER_MISSILE_SPEED = 1.5;
 const ENEMY_BULLET_SPEED  = 1;
 const ENEMY_MISSILE_SPEED = 0.7;
-const POWERUP_DRIFT_SPEED = 0.08;
+const POWERUP_DRIFT_SPEED = 0.2;
 
 // ── Combat ───────────────────────────────────────────────────────────────────
 const INVINCIBLE_TICKS_BULLET  = 40;
@@ -46,19 +46,19 @@ const POWERUP_CHANCE_SHIELD  = 0.05;
 const POWERUP_CHANCE_MISSILE = 0.1;
 
 // ── Difficulty scaling ───────────────────────────────────────────────────────
-const SPEED_SCALE_DIVISOR   = 300;  // speedMult = 1 + score / SPEED_SCALE_DIVISOR
+const SPEED_SCALE_DIVISOR   = 400;  // speedMult = 1 + score / SPEED_SCALE_DIVISOR
 const SPAWN_INTERVAL_BASE   = 30;
 const SPAWN_INTERVAL_MIN    = 8;
 const SPAWN_INTERVAL_SCALE  = 60;   // interval shrinks 1 tick per N score
 const SPAWN_INTERVAL_JITTER = 10;
-const SPAWN_BATCH_BASE      = 2;
+const SPAWN_BATCH_BASE      = 1;
 const SPAWN_BATCH_MAX       = 4;
-const SPAWN_BATCH_SCALE     = 150;  // batch grows 1 per N score
+const SPAWN_BATCH_SCALE     = 250;  // batch grows 1 per N score
 
 // ── Timers (ticks) ───────────────────────────────────────────────────────────
 const WAVE_COOLDOWN_TICKS    = 180;
 const MSG_DEFAULT_TICKS      = 70;
-const SCORE_FLASH_TICKS      = 10;
+const SCORE_FLASH_TICKS      = 6;
 const EXPLOSION_TICKS        = 5;
 const INTERCEPT_EXPLOSION_TICKS = 4;
 const BOMB_EXPLOSION_TICKS   = 10;
@@ -77,9 +77,9 @@ const C = {
 };
 
 const ENEMIES = {
-  xwing: { art: ["\\-X-/", " |^| "], w: 5, h: 2, score: 10, speed: 0.12, fireRate: 70, color: C.red },
-  ywing: { art: ["--[Y]--", "|=| |=|"], w: 7, h: 2, score: 25, speed: 0.08, fireRate: 55, color: C.gold, missileRate: 180 },
-  awing: { art: ["/A\\", "|||"], w: 3, h: 2, score: 15, speed: 0.22, fireRate: 90, color: C.blue },
+  xwing: { art: ["\/-X-\\", " |^| "], w: 5, h: 2, score: 50, speed: 0.10, fireRate: 70, color: C.red },
+  ywing: { art: ["--[Y]--", "|=| |=|"], w: 7, h: 2, score: 75, speed: 0.06, fireRate: 55, color: C.gold, missileRate: 180 },
+  awing: { art: ["\\A/", "|||"], w: 3, h: 2, score: 50, speed: 0.18, fireRate: 90, color: C.blue },
 };
 
 const SPAWN_POOL = ["xwing", "xwing", "xwing", "ywing", "ywing", "awing"];
@@ -223,17 +223,17 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
         const py = Math.floor(p.y);
         if (py >= 0 && py < GAME_ROWS) {
           if (p.kind === "shield") {
-            setCell(chars, colors, p.x - 1, py, "[", C.white);
-            setCell(chars, colors, p.x,     py, "+", C.white);
-            setCell(chars, colors, p.x + 1, py, "]", C.white);
+            setCell(chars, colors, p.x - 1, py, "[", C.green);
+            setCell(chars, colors, p.x,     py, "+", C.green);
+            setCell(chars, colors, p.x + 1, py, "]", C.green);
           } else if (p.kind === "bomb") {
-            setCell(chars, colors, p.x - 1, py, "{", C.magenta);
-            setCell(chars, colors, p.x,     py, "B", C.magenta);
-            setCell(chars, colors, p.x + 1, py, "}", C.magenta);
+            setCell(chars, colors, p.x - 1, py, "{", C.green);
+            setCell(chars, colors, p.x,     py, "B", C.green);
+            setCell(chars, colors, p.x + 1, py, "}", C.green);
           } else {
-            setCell(chars, colors, p.x - 1, py, "(", C.yellow);
-            setCell(chars, colors, p.x,     py, "M", C.yellow);
-            setCell(chars, colors, p.x + 1, py, ")", C.yellow);
+            setCell(chars, colors, p.x - 1, py, "(", C.green);
+            setCell(chars, colors, p.x,     py, "M", C.green);
+            setCell(chars, colors, p.x + 1, py, ")", C.green);
           }
         }
       });
