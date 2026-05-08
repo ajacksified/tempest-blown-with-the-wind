@@ -156,7 +156,7 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
       }
 
       s.bullets.forEach(b => {
-        setCell(chars, colors, b.x, b.y, "|", C.white);
+        setCell(chars, colors, b.x, b.y, "|", C.green);
       });
 
       if (s.missile) {
@@ -172,9 +172,15 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
       s.powerups.forEach(p => {
         const py = Math.floor(p.y);
         if (py >= 0 && py < GAME_ROWS) {
-          setCell(chars, colors, p.x - 1, py, "(", C.yellow);
-          setCell(chars, colors, p.x,     py, "M", C.yellow);
-          setCell(chars, colors, p.x + 1, py, ")", C.yellow);
+          if (p.kind === "shield") {
+            setCell(chars, colors, p.x - 1, py, "[", C.white);
+            setCell(chars, colors, p.x,     py, "+", C.white);
+            setCell(chars, colors, p.x + 1, py, "]", C.white);
+          } else {
+            setCell(chars, colors, p.x - 1, py, "(", C.yellow);
+            setCell(chars, colors, p.x,     py, "M", C.yellow);
+            setCell(chars, colors, p.x + 1, py, ")", C.yellow);
+          }
         }
       });
 
@@ -187,7 +193,7 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
       }
 
       s.enemyBullets.forEach(b => {
-        if (b.y >= 0 && b.y < GAME_ROWS) setCell(chars, colors, b.x, Math.floor(b.y), "*", C.red);
+        if (b.y >= 0 && b.y < GAME_ROWS) setCell(chars, colors, b.x, Math.floor(b.y), "|", C.red);
       });
 
       s.enemyMissiles.forEach(m => {
@@ -270,8 +276,14 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
         const py = Math.floor(p.y);
         if (p.x + 1 >= s.playerX && p.x - 1 < s.playerX + PLAYER_W
             && py >= PLAYER_Y && py < PLAYER_Y + PLAYER_H) {
-          s.missileLoaded = true;
-          setMsg(s, "TORPEDO LOADED!");
+          if (p.kind === "shield") {
+            s.lives = Math.min(s.lives + 1, 5);
+            s.prevLives = s.lives;
+            setMsg(s, "SHIELDS RESTORED!");
+          } else {
+            s.missileLoaded = true;
+            setMsg(s, "TORPEDO LOADED!");
+          }
           return false;
         }
         return true;
@@ -315,7 +327,7 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
         if (s.waveMessageCooldown <= 0) {
           setMsg(s, WAVE_MESSAGES[s.waveIndex % WAVE_MESSAGES.length]);
           s.waveIndex++;
-          s.waveMessageCooldown = 90;
+          s.waveMessageCooldown = 180;
         }
       }
 
@@ -336,8 +348,17 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
       if (destroyedEnemies.size > 0) {
         [...destroyedEnemies].forEach(ei => {
           const e = s.enemies[ei];
-          if (e && Math.random() < 0.20) {
+          if (!e || s.powerups.length >= 3) return;
+          const roll = Math.random();
+          if (roll < 0.02) {
             s.powerups.push({
+              kind: "shield",
+              x: Math.max(1, Math.min(COLS - 2, e.x + Math.floor(ENEMIES[e.type].w / 2))),
+              y: Math.max(0, Math.floor(e.y)),
+            });
+          } else if (roll < 0.12) {
+            s.powerups.push({
+              kind: "missile",
               x: Math.max(1, Math.min(COLS - 2, e.x + Math.floor(ENEMIES[e.type].w / 2))),
               y: Math.max(0, Math.floor(e.y)),
             });
@@ -347,15 +368,18 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
       s.bullets = s.bullets.filter((_, bi) => !usedBullets.has(bi));
       s.enemies = s.enemies.filter((_, ei) => !destroyedEnemies.has(ei));
 
-      // Player bullets intercept enemy missiles (silent removal, no explosion)
+      // Player bullets intercept enemy missiles
       const interceptedMissiles = new Set(), interceptBullets = new Set();
       s.bullets.forEach((b, bi) => {
         s.enemyMissiles.forEach((m, mi) => {
           if (interceptedMissiles.has(mi) || interceptBullets.has(bi)) return;
           const my = Math.floor(m.y);
-          if (b.x >= m.x - 1 && b.x <= m.x + 1 && b.y >= my && b.y <= my) {
+          if (b.x >= m.x - 1 && b.x <= m.x + 1 && b.y >= my - 1 && b.y <= my + 1) {
             interceptedMissiles.add(mi);
             interceptBullets.add(bi);
+            s.score += 10;
+            flashScr(s, true);
+            s.explosion = { x: m.x, y: my, timer: 4 };
           }
         });
       });

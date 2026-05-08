@@ -132,8 +132,8 @@ export default function GamesPage() {
                 {TITLE_ART}
               </pre>
               <p style={{ margin: '0 0 0.25rem 0', color: '#0a0' }}>
-                MISSION BRIEFING: Defend Imperial space against endless Rebel starfighter attacks.
-                Pilot a TIE Bomber and eliminate all targets. Do not let them reach your position.
+                MISSION BRIEFING: Defend the ISDII Challenge against Rebel starfighter attacks.
+                Pilot a Tempest-class TIE Bomber and eliminate all targets. Do not let them reach your position.
               </p>
               <p style={{ margin: '0 0 1.25rem 0', color: '#0a0' }}>
                 CONTROLS: ← → Arrow Keys to move &nbsp; | &nbsp; SPACE or ↑ to fire &nbsp; | &nbsp; ENTER to launch torpedo
