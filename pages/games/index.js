@@ -26,6 +26,14 @@ const GAMES = [
     desc:  'Defend the ISDII Challenge in your TIE Bomber against Rebel starfighters.',
     art:   '(o)[#](o)',
   },
+  {
+    id:    'saber-duel',
+    href:  '/games/saber-duel',
+    label: 'LSSP',
+    title: 'Lightsaber Sparring Program',
+    desc:  'Test your reflexes in lightsaber combat drills set to the Imperial March.',
+    art:   '|=[B]=|',
+  },
 ];
 
 export default function GamesIndex() {

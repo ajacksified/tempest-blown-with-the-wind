@@ -9,12 +9,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.28",
     "lodash": "^4.17.21",
     "next": "^16.2.4",
     "prop-types": "^15.8.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "titleize": "^2.1.0"
+    "titleize": "^2.1.0",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
