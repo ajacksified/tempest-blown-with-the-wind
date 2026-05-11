@@ -13,7 +13,7 @@ import styles from './LightsaberGame.module.css';
 //  maxComboMult   ceiling for the combo multiplier
 //  minLaneGapMs   soft minimum gap (ms) between consecutive notes in the same lane
 const DIFFICULTY_CONFIG = {
-  EASY: {
+  NOVICE: {
     scrollSpeed:      100,   // slow scroll — easy to read
     hitWindow:        0.130, // very forgiving timing window
     density:          0.05,  // only a quarter of MIDI notes shown
@@ -21,7 +21,7 @@ const DIFFICULTY_CONFIG = {
     maxComboMult:     2,     // combo multiplier tops out at ×2
     minLaneGapMs:     1000,   // ~2 notes/sec per lane
   },
-  MEDIUM: {
+  KNIGHT: {
     scrollSpeed:      200,
     hitWindow:        0.100,
     density:          0.1,
@@ -29,7 +29,7 @@ const DIFFICULTY_CONFIG = {
     maxComboMult:     4,
     minLaneGapMs:     500,   // ~8 notes/sec per lane
   },
-  HARD: {
+  REGENT: {
     scrollSpeed:      300,
     hitWindow:        0.05,
     density:          0.2,
@@ -310,7 +310,7 @@ function handlePress(gs, lane, elapsed, now) {
     } else {
       best.scored = true;
       gs.combo    = 0;
-      addFeedback(gs, lane, 'MISS', MISS_COLOR, now);
+      addFeedback(gs, lane, 'FAIL', MISS_COLOR, now);
     }
   } else {
     best.hit    = true;
@@ -320,7 +320,7 @@ function handlePress(gs, lane, elapsed, now) {
     gs.score += pts;
     gs.combo += 1;
     if (gs.combo > gs.highCombo) gs.highCombo = gs.combo;
-    addFeedback(gs, lane, perfect ? 'PERFECT!' : 'GOOD', perfect ? PERFECT_COLOR : GOOD_COLOR, now);
+    addFeedback(gs, lane, perfect ? 'COUNTER!' : 'DEFLECT', perfect ? PERFECT_COLOR : GOOD_COLOR, now);
   }
 }
 
@@ -336,10 +336,10 @@ function handleRelease(gs, lane, elapsed, now) {
         gs.score += pts;
         gs.combo += 1;
         if (gs.combo > gs.highCombo) gs.highCombo = gs.combo;
-        addFeedback(gs, lane, 'GOOD', GOOD_COLOR, now);
+        addFeedback(gs, lane, 'DEFLECT', GOOD_COLOR, now);
       } else {
         gs.combo = 0;
-        addFeedback(gs, lane, 'MISS', MISS_COLOR, now);
+        addFeedback(gs, lane, 'FAIL', MISS_COLOR, now);
       }
       note.scored = true;
     }
@@ -378,7 +378,7 @@ function tick(gs, now, onGameOver) {
     if (noteHeadY(note, elapsed, cfg.scrollSpeed) > missY) {
       note.scored = true;
       gs.combo    = 0;
-      addFeedback(gs, note.lane, 'MISS', MISS_COLOR, now);
+      addFeedback(gs, note.lane, 'FAIL', MISS_COLOR, now);
     }
   }
 
@@ -392,7 +392,7 @@ function tick(gs, now, onGameOver) {
       gs.score += pts;
       gs.combo += 1;
       if (gs.combo > gs.highCombo) gs.highCombo = gs.combo;
-      addFeedback(gs, note.lane, 'PERFECT!', PERFECT_COLOR, now);
+      addFeedback(gs, note.lane, 'COUNTER!', PERFECT_COLOR, now);
     }
   }
 

@@ -35,26 +35,27 @@ const QUOTES = {
     '"Something strong enough to forget multiplayer queue times."',
     '"Pre-battle nerves. Make it count."',
     '"Don\'t ask questions. Just pour."',
-    '"I lost a bet and now I need to win another one."',
+    '"I lost my ewok and now I need to find another one."',
   ],
   smooth:      [
     '"Something for the officer\'s mess. Something... plausible."',
-    '"First posting. Is this traditional?"',
+    '"A Major told me this was tradition?"',
     '"I was told to ask for the smooth one."',
   ],
   smoky:       [
     '"The smoky kind. Like the Warrior batch, but legal-adjacent."',
     '"Something that tastes like it has a history."',
+    '"Help me remember my first kill."',
   ],
   extreme:     [
     '"No questions. Just make it."',
     '"I have no remaining fear of death. Surprise me."',
-    '"I lost a bet."',
+    '"Last drink before the Phoenix."',
   ],
   any:         [
     '"Surprise me."',
     '"Whatever you have. It\'s been a week."',
-    '"The Admiral said to get \'something nice.\' Figure it out."',
+    '"The Admiral said to get \'something nice.\' I trust you."',
   ],
 };
 

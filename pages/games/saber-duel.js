@@ -34,13 +34,13 @@ const GAME_OVER_ART = [
   '',
 ].join('\n');
 
-const DIFFICULTIES = ['EASY', 'MEDIUM', 'HARD'];
+const DIFFICULTIES = ['NOVICE', 'KNIGHT', 'REGENT'];
 
 export default function SaberDuelPage() {
   const [phase, setPhase] = useState('login');
   const [pilotId, setPilotId] = useState('');
   const [pilotName, setPilotName] = useState('');
-  const [difficulty, setDifficulty] = useState('MEDIUM');
+  const [difficulty, setDifficulty] = useState('NOVICE');
   const [finalScore, setFinalScore] = useState(0);
   const [highestCombo, setHighestCombo] = useState(0);
   const [error, setError] = useState('');
@@ -148,9 +148,9 @@ export default function SaberDuelPage() {
                     className={`${s.btn} ${difficulty === d ? s.btnPrimary : ''}`}
                     style={{ marginLeft: 0 }}
                   >
-                    {d === 'EASY' && '[ EASY   ] — Wide timing windows, half the notes, slow scroll'}
-                    {d === 'MEDIUM' && '[ MEDIUM ] — Standard windows, most notes, moderate scroll'}
-                    {d === 'HARD' && '[ HARD   ] — Tight windows, all notes, fast scroll'}
+                    {d === 'NOVICE' && '[ NOVICE   ] — Wide timing windows, half the notes, slow scroll'}
+                    {d === 'KNIGHT' && '[ KNIGHT ] — Standard windows, most notes, moderate scroll'}
+                    {d === 'REGENT' && '[ REGENT   ] — Tight windows, all notes, fast scroll'}
                   </button>
                 ))}
               </div>
