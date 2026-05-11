@@ -1,6 +1,9 @@
 /* Shared terminal font stack */
 :root {
   --term-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --amber:     #ffb000;
+  --amber-dim: #a07000;
+  --amber-bg:  #1a0e00;
 }
 
 /* ── Base terminal wrapper ── */
@@ -129,3 +132,83 @@
   margin: 0 0 1.5rem 0;
   line-height: 1.5;
 }
+
+/* ── Amber terminal variant (Chalquila Refinery) ── */
+.terminalAmber {
+  color: var(--amber);
+  font-family: var(--term-font);
+}
+
+.titlePreAmber {
+  color: var(--amber);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.35;
+}
+
+.missionTextAmber {
+  margin: 0 0 0.25rem 0;
+  color: var(--amber-dim);
+}
+
+.inputAmber {
+  background-color: #000;
+  border: 1px solid var(--amber);
+  border-radius: 0;
+  color: var(--amber);
+  font-family: var(--term-font);
+  font-size: 1rem;
+  padding: 0.4rem 0.75rem;
+  outline: none;
+  width: 140px;
+}
+
+.inputAmber::placeholder {
+  color: var(--amber-dim);
+}
+
+.btnAmber {
+  background-color: #000;
+  border: 1px solid var(--amber);
+  border-radius: 0;
+  color: var(--amber);
+  cursor: pointer;
+  font-family: var(--term-font);
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  margin-left: 0.5rem;
+  transition: background-color 0.1s;
+}
+
+.btnAmber:hover {
+  background-color: var(--amber-bg);
+}
+
+.btnAmberPrimary {
+  margin-left: 0;
+}
+
+.errorAmber {
+  color: #ff4444;
+  margin: 0.75rem 0 0 0;
+}
+
+.loadingHeadingAmber {
+  color: var(--amber);
+}
+
+.loadingDetailAmber {
+  color: var(--amber-dim);
+}
+
+.scorePreAmber {
+  color: var(--amber);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.debriefPre {
+  color: var(--amber);
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+

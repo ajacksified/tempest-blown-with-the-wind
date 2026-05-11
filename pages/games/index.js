@@ -34,6 +34,14 @@ const GAMES = [
     desc:  'Test your reflexes in lightsaber combat drills set to the Imperial March.',
     art:   '|=[B]=|',
   },
+  {
+    id:    'refine',
+    href:  '/games/crcs-2.3',
+    label: 'CRCS',
+    title: 'Chalquila Refinery Control System',
+    desc:  'Operate a barely-functional Imperial distillery. Match orders. Survive.',
+    art:   '[~]={W}',
+  },
 ];
 
 export default function GamesIndex() {

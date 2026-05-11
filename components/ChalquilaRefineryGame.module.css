@@ -1,0 +1,68 @@
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.screen {
+  color: #ffb000;
+  background-color: #000;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  letter-spacing: 0;
+}
+
+.cmdRow {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.cmdPrompt {
+  color: #ffb000;
+  margin-right: 6px;
+  user-select: none;
+}
+
+.cmdInput {
+  background: #000;
+  border: none;
+  border-bottom: 1px solid #a07000;
+  color: #ffb000;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+  outline: none;
+  width: 420px;
+  padding: 2px 4px;
+  caret-color: #ffb000;
+}
+
+.cmdInput::placeholder {
+  color: #a07000;
+}
+
+.cmdInput:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.helpBar {
+  color: #a07000;
+  font-size: 11px;
+  margin-top: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
