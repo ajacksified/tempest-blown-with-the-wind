@@ -39,7 +39,9 @@ const DIFFICULTY_CONFIG = {
   },
 };
 
-// ── Lane-gap soft-boundary ratio ─────────────────────────────────────────────
+// ── Chord limiting ────────────────────────────────────────────────────────────
+const CHORD_WINDOW_MS  = 50;   // notes within this window are treated as one chord
+const CHORD_MAX_LANES  = 3;    // maximum simultaneous lanes in one chord
 // Notes between LANE_GAP_SOFT_FLOOR × minGap and minGap are kept probabilistically.
 const LANE_GAP_SOFT_FLOOR = 0.6;
 
@@ -226,12 +228,63 @@ function buildNotes(rawNotes, { density, holdThresholdMs, minLaneGapMs }) {
     .filter(n => n.isHold)
     .map(n => ({ lane: n.lane, start: n.time, end: n.time + n.duration }));
 
-  return builtNotes.filter(n => {
+  const noOverlapNotes = builtNotes.filter(n => {
     if (n.isHold) return true;   // hold notes are never culled by this pass
     return !holdWindows.some(
       hw => hw.lane === n.lane && n.time > hw.start && n.time < hw.end
     );
   });
+
+  // 6. Chord-limit pass — cap simultaneous notes to CHORD_MAX_LANES.
+  //    Notes are grouped by proximity (within CHORD_WINDOW_MS). When a group
+  //    exceeds the limit, the lane(s) to drop are chosen deterministically from
+  //    the sorted bitmask of lanes in that chord, so the same 4-lane pattern
+  //    always drops the same lane(s) every time it appears.
+  const chordWindowSec = CHORD_WINDOW_MS / 1000;
+  // Cache: bitmask of lane set → sorted array of lanes to keep
+  const keepCache = new Map();
+
+  function lanesToKeep(lanes) {
+    const mask = lanes.reduce((m, l) => m | (1 << l), 0);
+    if (!keepCache.has(mask)) {
+      // Always drop the lane(s) with the highest index first — deterministic
+      const sorted = [...lanes].sort((a, b) => a - b);
+      keepCache.set(mask, sorted.slice(0, CHORD_MAX_LANES));
+    }
+    return keepCache.get(mask);
+  }
+
+  const chordLimited = [];
+  let i = 0;
+  while (i < noOverlapNotes.length) {
+    // Collect all notes in the same chord window
+    const chord = [noOverlapNotes[i]];
+    let j = i + 1;
+    while (j < noOverlapNotes.length && noOverlapNotes[j].time - noOverlapNotes[i].time < chordWindowSec) {
+      chord.push(noOverlapNotes[j]);
+      j++;
+    }
+
+    if (chord.length <= CHORD_MAX_LANES) {
+      chordLimited.push(...chord);
+    } else {
+      const lanesInChord = [...new Set(chord.map(n => n.lane))];
+      if (lanesInChord.length <= CHORD_MAX_LANES) {
+        // More than CHORD_MAX_LANES notes but within allowed lanes — keep all
+        chordLimited.push(...chord);
+      } else {
+        const allowed = new Set(lanesToKeep(lanesInChord));
+        // Keep one note per allowed lane (prefer earliest)
+        for (const lane of allowed) {
+          const pick = chord.find(n => n.lane === lane);
+          if (pick) chordLimited.push(pick);
+        }
+      }
+    }
+    i = j;
+  }
+
+  return chordLimited;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
