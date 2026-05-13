@@ -15,9 +15,16 @@ const SECONDARY_OBJECTIVES = [
   { id: 'fleet_party',            label: 'PRIORITY: MASS PRODUCTION',        note: 'Reach 100% progress before 90s. Fleet is waiting.' },
 ];
 
-function pickSecondaryObjective() {
+function pickSecondaryObjective(profile) {
   if (Math.random() > 0.60) return null; // 40% of orders have no secondary objective
-  return SECONDARY_OBJECTIVES[Math.floor(Math.random() * SECONDARY_OBJECTIVES.length)];
+  const isLowTox = profile && profile.toxMax <= 5;
+  // Objectives that conflict with low-toxicity primary goals
+  const METHANOL_MODIFIERS = ['preferred_side_effects', 'tolerance_questionable', 'tolerance_strong', 'tolerance_immune'];
+  const pool = isLowTox
+    ? SECONDARY_OBJECTIVES.filter(o => !METHANOL_MODIFIERS.includes(o.id))
+    : SECONDARY_OBJECTIVES;
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // ── VIP customers ─────────────────────────────────────────────────────────────
@@ -118,7 +125,7 @@ function makeOrder(pilot) {
     isVIP: false,
     request,
     profile,
-    secondaryObjective: pickSecondaryObjective(),
+    secondaryObjective: pickSecondaryObjective(profile),
   };
 }
 
