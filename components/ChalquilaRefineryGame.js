@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import styles from './ChalquilaRefineryGame.module.css';
 
 // ── Layout ───────────────────────────────────────────────────────────────────
@@ -660,7 +660,7 @@ function getHint(gs, order) {
 }
 
 // ── Help / process reference overlay ─────────────────────────────────────────
-function buildHelp() {
+function buildHelp(dismissPrompt = false) {
   const rows = [];
   const pad = (s, n) => { const t = String(s); return t.length >= n ? t.slice(0, n) : t + ' '.repeat(n - t.length); };
   const row  = (content, col = C.dim)  => WALL + S(pad(content, W), col) + WALL;
@@ -701,7 +701,10 @@ function buildHelp() {
   rows.push(row('  high reactor load\u2192  chaos events spawn more frequently'));
   rows.push(row('  OFFLINE columns  \u2192  less ethanol + slower progress'));
   rows.push(S('\u2560' + '\u2550'.repeat(W) + '\u2563', C.dim));
-  rows.push(row('  type HELP again to dismiss', C.amber));
+  const dismissText = dismissPrompt
+    ? '  [ PRESS ENTER TO BEGIN ]'
+    : '  type HELP again to dismiss';
+  rows.push(row(dismissText, C.amber));
   rows.push(S('\u255a' + '\u2550'.repeat(W) + '\u255d', C.dim));
 
   return rows.join('\n');
@@ -898,13 +901,44 @@ function buildDisplay(gs, order, sessionResults, pilotName, batchNumber) {
   return rows.join('\n');
 }
 
+// ── Boot countdown screen ─────────────────────────────────────────────────────
+function buildBootScreen(count) {
+  const rows = [];
+  const pad = (s, n) => { const t = String(s); return t.length >= n ? t.slice(0, n) : t + ' '.repeat(n - t.length); };
+  const row = (content, col = C.dim) => WALL + S(pad(content, W), col) + WALL;
+
+  rows.push(S('\u2554' + '\u2550'.repeat(W) + '\u2557', C.dim));
+  rows.push(row('  CHALQUILA REFINERY CONTROL SYSTEM v2.3', C.amber));
+  rows.push(S('\u2560' + '\u2550'.repeat(W) + '\u2563', C.dim));
+  rows.push(row(''));
+  rows.push(row('  Initializing worm bioreactor...', C.dim));
+  rows.push(row('  Pressurizing distillation columns...', C.dim));
+  rows.push(row('  Calibrating impurity sensors...', C.dim));
+  rows.push(row('  Running pre-batch safety checks...', C.dim));
+  rows.push(row(''));
+  rows.push(S('\u2560' + '\u2550'.repeat(W) + '\u2563', C.dim));
+  rows.push(row(''));
+  const barW = 30;
+  const filled = Math.round(((5 - count) / 5) * barW);
+  const barHtml = S('\u2588'.repeat(filled), C.amber) + S('\u2591'.repeat(barW - filled), C.dim);
+  const barLine = WALL + S('  SYSTEMS READY IN ', C.dim) + S(String(count) + 's  [', C.amber) + barHtml + S(']', C.amber) + S(' '.repeat(W - 19 - 4 - barW - 2 - String(count).length), C.dim) + WALL;
+  rows.push(barLine);
+  rows.push(row(''));
+  rows.push(S('\u255a' + '\u2550'.repeat(W) + '\u255d', C.dim));
+  return rows.join('\n');
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function ChalquilaRefineryGame({ order, onComplete, sessionResults = [], pilotName = '', batchNumber = 1 }) {
+export default function ChalquilaRefineryGame({ order, onComplete, sessionResults = [], pilotName = '', batchNumber = 1, showInitialHelp = false }) {
   const preRef   = useRef(null);
   const inputRef = useRef(null);
   const gsRef    = useRef(null);
   const onCompleteRef = useRef(onComplete);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
+  // 'help' → show help screen (first game only), 'booting' → 5s countdown, null → playing
+  const [prePhase, setPrePhase] = useState(showInitialHelp ? 'help' : 'booting');
+  const [bootCount, setBootCount] = useState(5);
 
   const render = useCallback(() => {
     if (preRef.current && gsRef.current) {
@@ -912,8 +946,35 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
     }
   }, [order, sessionResults, pilotName, batchNumber]);
 
-  // Game loop
+  // Boot countdown effect — runs when prePhase === 'booting'
   useEffect(() => {
+    if (prePhase !== 'booting') return;
+    setBootCount(5);
+    if (preRef.current) preRef.current.innerHTML = buildBootScreen(5);
+    const interval = setInterval(() => {
+      setBootCount(prev => {
+        const next = prev - 1;
+        if (preRef.current) preRef.current.innerHTML = buildBootScreen(next);
+        if (next <= 0) {
+          clearInterval(interval);
+          setPrePhase(null);
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [prePhase]);
+
+  // Show help overlay when in help phase
+  useEffect(() => {
+    if (prePhase === 'help' && preRef.current) {
+      preRef.current.innerHTML = buildHelp(/* dismissPrompt */ true);
+    }
+  }, [prePhase]);
+
+  // Game loop — only starts once prePhase is null
+  useEffect(() => {
+    if (prePhase !== null) return;
     gsRef.current = initState();
     gsRef.current.toxMax = order.profile.toxMax;
     render();
@@ -932,12 +993,12 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [order, render]);
+  }, [prePhase, order, render]);
 
   // Keydown: A/B/C for choice-type chaos events
   const handleKeyDown = useCallback(e => {
     const gs = gsRef.current;
-    if (!gs || !gs.chaosEvent || gs.chaosEvent.type !== 'choice') return;
+    if (!gs || !gs.chaosEvent || gs.chaosEvent.type !== 'choice' || prePhase !== null) return;
     const key = e.key.toUpperCase();
     const choice = gs.chaosEvent.choices.find(c => c.key === key);
     if (choice) {
@@ -947,10 +1008,9 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
       render();
       inputRef.current?.focus();
     }
-  }, [render]);
+  }, [render, prePhase]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
@@ -959,12 +1019,18 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
     if (e.key !== 'Enter') return;
     const input = inputRef.current;
     if (!input) return;
+    // Dismiss help screen on any Enter (even empty)
+    if (prePhase === 'help') {
+      input.value = '';
+      setPrePhase('booting');
+      return;
+    }
     const val = input.value.trim();
     input.value = '';
-    if (!val || !gsRef.current || gsRef.current.complete) return;
+    if (!val || !gsRef.current || gsRef.current.complete || prePhase !== null) return;
     parseCmd(val, gsRef.current);
     render();
-  }, [render]);
+  }, [render, prePhase]);
 
   return (
     <div className={styles.wrapper}>

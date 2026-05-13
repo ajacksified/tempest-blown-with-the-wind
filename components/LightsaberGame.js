@@ -707,7 +707,7 @@ export default function LightsaberGame({ pilotName, difficulty, onGameOver }) {
 
   // Keyboard input
   useEffect(() => {
-    const LANE_KEY = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 };
+    const LANE_KEY = { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, a: 0, s: 1, w: 2, d: 3 };
 
     const onDown = (e) => {
       if (e.key === 'Escape') {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import ChalquilaRefineryGame from '../../components/ChalquilaRefineryGame';
 import s from '../../styles/games.module.css';
 
@@ -78,7 +78,7 @@ const VIP_CUSTOMERS = [
   },
   {
     customerLabel: 'FA Phoenix Berkana',
-    customerTitle: 'WING COMMANDER',
+    customerTitle: 'WARFARE OFFICER',
     isVIP: true,
     request: '"Something that doesn\'t taste like engine coolant. Please."',
     profile: PROFILES.smooth,
@@ -86,7 +86,7 @@ const VIP_CUSTOMERS = [
   },
   {
     customerLabel: 'FA John T. Clark',
-    customerTitle: 'SYSTEMS OPERATIONS OFFICER',
+    customerTitle: 'STRATEGIC OPERATIONS OFFICER',
     isVIP: true,
     request: '"I\'ve audited the worm bioreactor logs. Technically this is sanctioned."',
     profile: PROFILES.any,
@@ -136,55 +136,191 @@ function generateOrder(tempestPilots, otherPilots) {
 }
 
 // ── Comedy debrief text ───────────────────────────────────────────────────────
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 function getQualityText(scores) {
   const { quality, finalEthanol, profile, producedFlavor, flavorMatch } = scores;
   const inRange = finalEthanol >= profile.proofMin && (!profile.proofMax || finalEthanol <= profile.proofMax);
   // Flavor mismatch overrides quality rating
   if (flavorMatch === false) {
-    if (profile.flavor === 'smoky')  return '"Expected something smoky. This tastes like water. Fancy water."';
-    if (profile.flavor === 'sweet')  return '"Too aggressive. I asked for smooth, not a reactor flush."';
-    if (profile.flavor === 'harsh')  return '"This is somehow pleasant. That is not what I ordered."';
+    if (profile.flavor === 'smoky')  return pick([
+      '"Expected something smoky. This tastes like water. Fancy water."',
+      '"I ordered smoke. I received disappointment."',
+      '"Where is the char? I wanted it Silwar-style."',
+    ]);
+    if (profile.flavor === 'sweet')  return pick([
+      '"Too aggressive. I asked for smooth, not a reactor flush."',
+      '"This is harsh. I said smooth. These are different words."',
+      '"Did you even read the order?"',
+    ]);
+    if (profile.flavor === 'harsh')  return pick([
+      '"This is somehow pleasant. That is not what I ordered."',
+      '"I asked for something that fights back. This is cooperative."',
+      '"Too refined. I needed something that bites."',
+    ]);
   }
   if (flavorMatch === true) {
-    if (profile.flavor === 'smoky')  return '"Has that characteristic bite. Exactly right."';
-    if (profile.flavor === 'sweet')  return '"Remarkably smooth for a bioreactor product."';
-    if (profile.flavor === 'harsh')  return '"Appropriately unpleasant. Well done."';
+    if (profile.flavor === 'smoky')  return pick([
+      '"Has that characteristic bite. Exactly right."',
+      '"Smoky finish. You actually read the brief."',
+      '"I can taste the column failures. Artisanal."',
+    ]);
+    if (profile.flavor === 'sweet')  return pick([
+      '"Remarkably smooth for a bioreactor product."',
+      '"Almost civilized. Well done."',
+      '"I forgot this came from a refinery. Briefly."',
+    ]);
+    if (profile.flavor === 'harsh')  return pick([
+      '"Appropriately unpleasant. Well done."',
+      '"It tried to escape the glass. Outstanding."',
+      '"My sinuses have filed a formal complaint. 10/10."',
+    ]);
   }
-  if (quality >= 90 && inRange) return '"Exceptional. Do not tell the Admiral."';
-  if (quality >= 80) return '"Surprisingly smooth for a reactor byproduct."';
-  if (quality >= 65 && inRange) return '"Within acceptable parameters. Barely."';
-  if (quality >= 50) return '"Technically drinkable."';
-  if (quality >= 35) return '"We have had stronger opinions about paint thinner."';
-  return '"This is coolant."';
+  if (quality >= 90 && inRange) return pick([
+    '"Exceptional. Do not tell the Admiral."',
+    '"This cannot have come from this facility."',
+    '"I am genuinely concerned about how good this is."',
+    '"Forwarding to Fleet Command. For research."',
+  ]);
+  if (quality >= 80) return pick([
+    '"Surprisingly smooth for a reactor byproduct."',
+    '"Better than expected. Lower your expectations next time."',
+    '"A credit to the refinery. That refinery, specifically."',
+    '"I would order this again, under duress."',
+  ]);
+  if (quality >= 65 && inRange) return pick([
+    '"Within acceptable parameters. Barely."',
+    '"It meets the minimum. So does gravity."',
+    '"Adequate. The Empire asks for nothing more."',
+    '"Drinkable. We have low standards and this clears them."',
+  ]);
+  if (quality >= 50) return pick([
+    '"Technically drinkable."',
+    '"Imperial regulations do not explicitly prohibit this."',
+    '"No one died during tasting. Progress."',
+    '"I have consumed worse. Not recently."',
+  ]);
+  if (quality >= 35) return pick([
+    '"We have had stronger opinions about paint thinner."',
+    '"I have regrets. About this, specifically."',
+    '"This is a cry for help in liquid form."',
+    '"The aftertaste has an aftertaste."',
+  ]);
+  return pick([
+    '"This is coolant."',
+    '"What did you do?!"',
+    '"Medical is on standby. For everyone."',
+    '"I am filing this under weapons."',
+    '"Fleet liability paperwork incoming."',
+  ]);
 }
 
 function getMedicalText(scores) {
   const { finalMethanol, profile } = scores;
-  if (finalMethanol <= profile.toxMax * 0.3) return '"Within acceptable parameters. Barely."';
-  if (finalMethanol <= profile.toxMax)       return '"Approved for consumption. With reservations."';
-  if (finalMethanol <= profile.toxMax * 1.5) return '"Please stop serving this to pilots."';
-  if (finalMethanol <= profile.toxMax * 2.5) return '"Recommend immediate stomach pump availability."';
-  return '"This is a controlled substance."';
+  if (finalMethanol <= profile.toxMax * 0.3) return pick([
+    '"Within acceptable parameters. Barely."',
+    '"Toxicology gives a reluctant thumbs up."',
+    '"Cleaner than expected. Suspicious."',
+    '"Fleet Medical has no objections. First time."',
+  ]);
+  if (finalMethanol <= profile.toxMax) return pick([
+    '"Approved for consumption. With reservations."',
+    '"Technically safe. Technically."',
+    '"Within limits. We are not happy about it."',
+    '"Pilots have consumed worse. We checked."',
+  ]);
+  if (finalMethanol <= profile.toxMax * 1.5) return pick([
+    '"Please stop serving this to pilots."',
+    '"Methanol trending concerning. Please advise."',
+    '"We are updating the waiver forms."',
+    '"Two pilots have requested eye exams."',
+  ]);
+  if (finalMethanol <= profile.toxMax * 2.5) return pick([
+    '"Recommend immediate stomach pump availability."',
+    '"This batch has been flagged in three systems."',
+    '"Medical bay is at capacity. Relatedly."',
+    '"We are not angry, just disappointed and legally obligated to report this."',
+  ]);
+  return pick([
+    '"This is a controlled substance."',
+    '"We have contacted the relevant authorities."',
+    '"This batch has been classified."',
+    '"Do not serve this. Do not store this. Dispose responsibly."',
+  ]);
 }
 
 function getEngineeringText(scores) {
   const { stability, explosions } = scores;
-  if (explosions > 2)     return '"How is anyone still alive?"';
-  if (explosions > 0)     return `"${explosions} explosion(s). Reactor survived. Barely."`;
-  if (stability >= 80)    return '"Reactor nominal. Suspicious."';
-  if (stability >= 60)    return '"Reactor survived. We are choosing not to ask how."';
-  if (stability >= 40)    return '"Three near-misses is three too many."';
-  return '"Please submit a full damage report."';
+  if (explosions > 2) return pick([
+    '"How is anyone still alive?"',
+    '"Structural assessment: significantly less structure."',
+    '"We have submitted a requisition for a new refinery."',
+    '"Insurance claim filed. Again."',
+  ]);
+  if (explosions > 0) return pick([
+    `"${explosions} explosion(s). Reactor survived. Barely."`,
+    `"${explosions} unplanned detonation(s). The walls disagree."`,
+    '"Something exploded. We are choosing to call it a feature."',
+  ]);
+  if (stability >= 80) return pick([
+    '"Reactor nominal. Suspicious."',
+    '"No anomalies detected. Reviewing sensor data for errors."',
+    '"Engineering has nothing to report. Unnerving."',
+    '"Reactor is fine. We are not used to this."',
+  ]);
+  if (stability >= 60) return pick([
+    '"Reactor survived. We are choosing not to ask how."',
+    '"Structurally intact. Philosophically shaken."',
+    '"Most systems are functional. Most."',
+    '"The reactor is stable. The crew is less so."',
+  ]);
+  if (stability >= 40) return pick([
+    '"Three near-misses is three too many."',
+    '"We have replaced four pressure gauges and one engineer."',
+    '"Reactor did not explode. Setting the bar low."',
+    '"The alarms were not decorative. We need to have a talk."',
+  ]);
+  return pick([
+    '"Please submit a full damage report."',
+    '"We have submitted a full damage report on your behalf."',
+    '"Engineering recommends a career change."',
+    '"The refinery would like to file a restraining order."',
+  ]);
 }
 
 function getCustomerText(scores) {
   const { quality, toxScore, finalEthanol, profile } = scores;
   const inRange = finalEthanol >= profile.proofMin;
-  if (quality >= 85 && toxScore >= 75) return '"Worth the black market price."';
-  if (quality >= 70 && inRange)        return '"Acceptable for its intended purpose."';
-  if (toxScore < 20)                   return '"I\'ve gone blind. 5 stars."';
-  if (quality < 40)                    return '"This isn\'t what I ordered but I\'m drinking it anyway."';
-  return '"I can hear colors now."';
+  if (quality >= 85 && toxScore >= 75) return pick([
+    '"Worth the black market price."',
+    '"I am telling no one where this came from."',
+    '"Ordered again immediately. Discretely."',
+    '"This exceeded expectations I did not have."',
+  ]);
+  if (quality >= 70 && inRange) return pick([
+    '"Acceptable for its intended purpose."',
+    '"Does the job. Does not overstay its welcome."',
+    '"Functional. I respect that."',
+    '"Met the brief. Mostly."',
+  ]);
+  if (toxScore < 20) return pick([
+    '"I\'ve gone blind. 5 stars."',
+    '"I can no longer see the queue. Problem solved."',
+    '"My vision has improved in unexpected ways."',
+    '"Did not expect this. Very much did not expect this."',
+  ]);
+  if (quality < 40) return pick([
+    '"This isn\'t what I ordered but I\'m drinking it anyway."',
+    '"Not what I asked for. Finishing it regardless."',
+    '"I have questions. I am not asking them."',
+    '"Technically a beverage."',
+  ]);
+  return pick([
+    '"I can hear colors now."',
+    '"Something has changed about my perception of time."',
+    '"The queue seems shorter. Everything seems shorter."',
+    '"Submitting feedback when my hands stop shaking."',
+  ]);
 }
 
 function getTitle(scores) {
@@ -229,6 +365,7 @@ export default function RefinePage() {
   const [otherPilots, setOtherPilots]   = useState([]);
   const [sessionResults, setSessionResults] = useState([]); // [{order, scores}]
   const [batchNumber, setBatchNumber]   = useState(1);
+  const hasSeenHelpRef = useRef(false);
 
   // ── Login handler ──
   const handleLogin = async e => {
@@ -316,11 +453,14 @@ export default function RefinePage() {
     setOtherPilots([]);
     setSessionResults([]);
     setBatchNumber(1);
+    hasSeenHelpRef.current = false;
     setPhase('login');
   };
 
   // ── Render playing phase (full-screen game) ──
   if (phase === 'playing' && order) {
+    const showInitialHelp = !hasSeenHelpRef.current;
+    if (showInitialHelp) hasSeenHelpRef.current = true;
     return (
       <ChalquilaRefineryGame
         order={order}
@@ -328,6 +468,7 @@ export default function RefinePage() {
         sessionResults={sessionResults}
         pilotName={pilotName}
         batchNumber={batchNumber}
+        showInitialHelp={showInitialHelp}
       />
     );
   }

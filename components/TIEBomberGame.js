@@ -179,17 +179,17 @@ export default function TIEBomberGame({ pilotName, onGameOver }) {
     const handleKeyDown = (e) => {
       const s = stateRef.current;
       if (!s || s.gameOver) return;
-      if (e.key === "ArrowLeft")  { s.keys.left  = true; e.preventDefault(); }
-      if (e.key === "ArrowRight") { s.keys.right = true; e.preventDefault(); }
-      if (e.key === " " || e.key === "ArrowUp") { s.keys.space = true; e.preventDefault(); }
+      if (e.key === "ArrowLeft"  || e.key === "a") { s.keys.left  = true; e.preventDefault(); }
+      if (e.key === "ArrowRight" || e.key === "d") { s.keys.right = true; e.preventDefault(); }
+      if (e.key === " " || e.key === "ArrowUp" || e.key === "w") { s.keys.space = true; e.preventDefault(); }
       if (e.key === "Enter") { s.keys.enter = true; e.preventDefault(); }
     };
     const handleKeyUp = (e) => {
       const s = stateRef.current;
       if (!s) return;
-      if (e.key === "ArrowLeft")  s.keys.left  = false;
-      if (e.key === "ArrowRight") s.keys.right = false;
-      if (e.key === " " || e.key === "ArrowUp") { s.keys.space = false; s.spaceFired = false; }
+      if (e.key === "ArrowLeft"  || e.key === "a") s.keys.left  = false;
+      if (e.key === "ArrowRight" || e.key === "d") s.keys.right = false;
+      if (e.key === " " || e.key === "ArrowUp" || e.key === "w") { s.keys.space = false; s.spaceFired = false; }
       if (e.key === "Enter") { s.keys.enter = false; s.enterFired = false; }
     };
 
