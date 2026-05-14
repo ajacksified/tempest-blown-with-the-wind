@@ -3,8 +3,11 @@ import { rankImages, ranks } from './ranks';
 import MedalCase from './medalCase';
 import Link from './link';
 import styles from './styles';
+import { useConfig } from '../src/configContext';
 
 export default function Recognition({ activityData }) {
+  const { colorHelmetBase } = useConfig();
+  const linkStyle = { ...styles.listItemLink, backgroundColor: colorHelmetBase ?? styles.listItemLink.backgroundColor };
   const promotions = activityData.filter(
     (p) => p.activity?.NEW_PROMOTION?.length,
   );
@@ -59,7 +62,7 @@ export default function Recognition({ activityData }) {
                   href={`https://tc.emperorshammer.org/record.php?pin=${pilot.PIN}&type=profile`}
                   target="_blank"
                   rel="noreferrer"
-                  style={styles.listItemLink}
+                  style={linkStyle}
                 >
                   {`${ranks[pilot.rank] ? ranks[pilot.rank].toUpperCase() : pilot.rank} ${pilot.name}`}
                 </Link>
