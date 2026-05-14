@@ -19,13 +19,39 @@ const sidebarStyle = {
   fontSize: '13px',
 };
 
+const inputStyle = {
+  width: '100%',
+  boxSizing: 'border-box',
+  background: '#111',
+  color: '#eee',
+  border: '1px solid #444',
+  padding: '4px 6px',
+  fontSize: '12px',
+  marginTop: '4px',
+};
+
 export default function ReportSidebar({
+  uniformUrl, onUniformUrlChange,
   orders, onOrdersChange,
   competitions, onCompetitionsChange,
   citations, citationsChange, onCitationsChange, onCitationsChangeChange,
 }) {
   return (
     <div data-editor-only="true" style={sidebarStyle}>
+      <span style={sidebarSectionHead}>CMDR Uniform</span>
+      <label style={{ display: 'block', opacity: 0.7, fontSize: '11px', marginBottom: '2px' }}>
+        Image URL
+      </label>
+      <input
+        type="url"
+        value={uniformUrl}
+        onChange={(e) => onUniformUrlChange(e.target.value)}
+        placeholder="https://…"
+        style={inputStyle}
+      />
+
+      <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
+
       <span style={sidebarSectionHead}>Orders</span>
       <OrdersForm orders={orders} onChange={onOrdersChange} />
 
@@ -51,6 +77,8 @@ export default function ReportSidebar({
 }
 
 ReportSidebar.propTypes = {
+  uniformUrl: T.string.isRequired,
+  onUniformUrlChange: T.func.isRequired,
   orders: T.arrayOf(T.object).isRequired,
   onOrdersChange: T.func.isRequired,
   competitions: T.arrayOf(T.object).isRequired,

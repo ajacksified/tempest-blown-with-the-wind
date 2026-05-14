@@ -122,6 +122,9 @@ export default function ReportEditorV2() {
   const [citations, setCitations] = useState(DEFAULT_CITATIONS);
   const [citationsChange, setCitationsChange] = useState(DEFAULT_CITATIONS_CHANGE);
 
+  // Uniform image URL (filled in manually by the CMDR until the API provides it)
+  const [uniformUrl, setUniformUrl] = useState('');
+
   // Pilot data
   const [activityData, setActivityData] = useState([]);
   const [pilotActivity, setPilotActivity] = useState({});
@@ -261,6 +264,7 @@ export default function ReportEditorV2() {
 
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <ReportSidebar
+            uniformUrl={uniformUrl} onUniformUrlChange={setUniformUrl}
             orders={orders} onOrdersChange={setOrders}
             competitions={competitions} onCompetitionsChange={setCompetitions}
             citations={citations} citationsChange={citationsChange}
@@ -287,7 +291,7 @@ export default function ReportEditorV2() {
                 >
                   <img
                     style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
-                    src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
+                    src={uniformUrl || 'https://tempest-blown-with-the-wind.vercel.app/uniform.jpg'}
                     alt={`The uniform of ${liveConfig.cmdr?.name}`}
                   />
                 </a>
