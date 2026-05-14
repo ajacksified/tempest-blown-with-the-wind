@@ -39,6 +39,5 @@ export default function mergeSquadronData(apiResponse, baseConfig, fleetEntry = 
     },
     flights: flights.length > 0 ? flights : (baseConfig.flights ?? []),
     colorHelmetBase: fleetEntry?.uniformData?.colorHelmetBase ?? baseConfig.colorHelmetBase,
-    colorHelmetDecoration: fleetEntry?.uniformData?.colorHelmetDecoration ?? baseConfig.colorHelmetDecoration,
   };
 }

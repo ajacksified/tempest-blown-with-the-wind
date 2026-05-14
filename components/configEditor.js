@@ -41,12 +41,6 @@ const sectionHeadingStyle = {
   paddingBottom: '3px',
 };
 
-const gridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-  gap: '0.5em',
-};
-
 function Field({ label, value, onChange, type = 'text', hint }) {
   return (
     <div style={fieldStyle}>
@@ -74,41 +68,6 @@ Field.defaultProps = {
   value: '',
   type: 'text',
   hint: null,
-};
-
-function PersonSection({ label, data, onChange }) {
-  function set(key, val) {
-    onChange({ ...data, [key]: val });
-  }
-
-  return (
-    <div style={sectionStyle}>
-      <div style={sectionHeadingStyle}>{label}</div>
-      <div style={gridStyle}>
-        <Field label="Name" value={data.name} onChange={(v) => set('name', v)} />
-        <Field label="Title" value={data.title} onChange={(v) => set('title', v)} />
-        <Field label="PIN" value={data.pin} onChange={(v) => set('pin', v)} type="number" />
-        {data.intro !== undefined && (
-          <Field label="Intro Line" value={data.intro} onChange={(v) => set('intro', v)} />
-        )}
-        {data.email !== undefined && (
-          <Field label="Email" value={data.email} onChange={(v) => set('email', v)} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-PersonSection.propTypes = {
-  label: T.string.isRequired,
-  data: T.shape({
-    name: T.string,
-    title: T.string,
-    pin: T.number,
-    intro: T.string,
-    email: T.string,
-  }).isRequired,
-  onChange: T.func.isRequired,
 };
 
 export default function ConfigEditor({ onChange }) {
@@ -188,15 +147,6 @@ export default function ConfigEditor({ onChange }) {
                   hint="Use {{number}} for the report number"
                 />
               </div>
-
-              {/* CMDR intro line */}
-              <div style={sectionStyle}>
-                <div style={sectionHeadingStyle}>CMDR</div>
-                <Field label="Intro Line" value={config.cmdr?.intro} onChange={(v) => set('cmdr', { ...config.cmdr, intro: v })} />
-              </div>
-
-              {/* Battlegroup Commander */}
-              <PersonSection label="Battlegroup Commander" data={config.com ?? {}} onChange={(v) => set('com', v)} />
 
               {/* Save */}
               <div style={{ display: 'flex', gap: '1em', alignItems: 'center', marginTop: '0.5em' }}>

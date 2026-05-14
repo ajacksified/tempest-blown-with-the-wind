@@ -129,7 +129,6 @@ export default function ReportEditorV2() {
           setLiveConfig((prev) => processConfig({
             ...prev,
             colorHelmetBase: fleetEntry.uniformData.colorHelmetBase,
-            colorHelmetDecoration: fleetEntry.uniformData.colorHelmetDecoration,
           }));
         }
       });
@@ -246,14 +245,14 @@ export default function ReportEditorV2() {
             <section id="transmission" aria-labelledby="transmission-heading" style={styles.sectionBlock}>
               <p id="transmission-heading" style={styles.sectionPrefix}>[COMM] TRANSMISSION // PRIORITY: ROUTINE</p>
               <a
-                href={`https://tc.emperorshammer.org/record.php?pin=${liveConfig.cmdr.pin}&type=profile`}
+                href={`https://tc.emperorshammer.org/record.php?pin=${liveConfig.cmdr?.pin}&type=profile`}
                 target="_blank"
                 rel="noreferrer"
               >
                 <img
                   style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
                   src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
-                  alt={`The uniform of ${liveConfig.cmdr.name}`}
+                  alt={`The uniform of ${liveConfig.cmdr?.name}`}
                 />
               </a>
               <EditableText value={introHtml} onChange={setIntroHtml} />

@@ -1,14 +1,5 @@
 {
   "reportTitleFormat": "Tempestuous Transmission #{{number}}",
   "squadronId": "45",
-  "colorHelmetBase": "#2a499c",
-  "colorHelmetDecoration": "#fa9459",
-  "cmdr": {
-    "intro": "From the Desk of Silwar Naiilo"
-  },
-  "com": {
-    "name": "Locke Setzer",
-    "title": "AD Locke Setzer",
-    "pin": 4541
-  }
+  "colorHelmetBase": "#2a499c"
 }

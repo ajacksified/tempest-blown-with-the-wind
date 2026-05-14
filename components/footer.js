@@ -14,7 +14,7 @@ export default function Footer({ children }) {
     href: `https://tc.emperorshammer.org/roster.php?type=sqn&id=${config.squadronId}`,
     title: 'Squadron Page',
   }, {
-    href: `mailto:${config.cmdr.email}`,
+    href: `mailto:${config.cmdr?.email}`,
     title: 'Email the CMDR',
   }, {
     href: 'https://tc.emperorshammer.org/admin.php',

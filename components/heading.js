@@ -19,7 +19,7 @@ export default function Heading({ reportNumber, submissionDate, statusLine }) {
       <h1 style={styles.h1}>{config.reportTitleFormat(reportNumber)}</h1>
       <p style={{ margin: '.25rem 0', opacity: 0.85 }}>
         {'Submitted by '}
-        <strong>{config.cmdr.title}</strong>
+        <strong>{config.cmdr?.title}</strong>
         {submissionDate && (
           <> · <time dateTime={submissionDate}>{formatDate(submissionDate)}</time></>
         )}

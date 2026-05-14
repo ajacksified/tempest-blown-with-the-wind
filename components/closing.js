@@ -9,7 +9,7 @@ export default function Closing({ children }) {
       <p style={styles.sectionPrefix}>[COMM] CLOSING SIGNAL</p>
       {children}
       <p style={{ marginTop: '1rem' }}>
-        {`— ${config.cmdr.title}`}
+        {`— ${config.cmdr?.title}`}
         <br />
         <span style={{ color: styles.green }}>
           {'>> TRANSMISSION COMPLETE'}
