@@ -1,5 +1,5 @@
 /* eslint react/no-unescaped-entities: 0, react/jsx-props-no-spreading: 0 */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import T from 'prop-types';
 
 import Heading from '../../components/heading';
@@ -153,26 +153,45 @@ const labelStyle = {
 // Inline editable pilot activity row
 // ---------------------------------------------------------------------------
 
+function EditableField({ value, onInput, label, ddStyle }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current && ref.current.textContent !== value) {
+      ref.current.textContent = value;
+    }
+  }, [value]);
+
+  return (
+    <div style={{ marginBottom: '0.25em' }}>
+      <dt style={{ display: 'inline', ...styles.listItemLabel }}>{label}</dt>
+      <dd
+        ref={ref}
+        style={{ ...ddStyle, outline: 'none', paddingLeft: '0.4em', display: 'inline-block', minWidth: '4em' }}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={(e) => onInput(e.currentTarget.textContent)}
+      />
+      <br />
+    </div>
+  );
+}
+
+EditableField.propTypes = {
+  value: T.string,
+  onInput: T.func.isRequired,
+  label: T.string.isRequired,
+  ddStyle: T.object,
+};
+
+EditableField.defaultProps = {
+  value: '',
+  ddStyle: {},
+};
+
 function EditablePilotActivity({ pilot, activity, onChange }) {
   const { PIN, name, rank } = pilot;
   const RankImage = rankImages[rank];
-
-  function field(key, label) {
-    return (
-      <div style={{ marginBottom: '0.25em' }}>
-        <dt style={{ display: 'inline', ...styles.listItemLabel }}>{label}</dt>
-        <dd
-          style={{ ...styles.dd, outline: 'none', paddingLeft: '0.4em', display: 'inline' }}
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={(e) => onChange(PIN, key, e.currentTarget.textContent)}
-        >
-          {activity[key] || ''}
-        </dd>
-        <br />
-      </div>
-    );
-  }
 
   return (
     <article style={styles.pilotCard}>
@@ -189,9 +208,9 @@ function EditablePilotActivity({ pilot, activity, onChange }) {
       </h4>
 
       <dl style={{ marginTop: '0', marginBottom: '0' }}>
-        {field('communication', 'Comms')}
-        {field('flightActivity', 'Activity')}
-        {field('notes', 'Notes')}
+        <EditableField label="Comms" value={activity.communication || 'Discord'} ddStyle={styles.dd} onInput={(v) => onChange(PIN, 'communication', v)} />
+        <EditableField label="Activity" value={activity.flightActivity || '---'} ddStyle={styles.dd} onInput={(v) => onChange(PIN, 'flightActivity', v)} />
+        <EditableField label="Notes" value={activity.notes || 'N/A'} ddStyle={styles.dd} onInput={(v) => onChange(PIN, 'notes', v)} />
       </dl>
     </article>
   );
@@ -441,6 +460,53 @@ export default function ReportEditorV2() {
   // Load Data
   // -------------------------------------------------------------------------
 
+  function formatActivitySummary(activity) {
+    if (!activity || typeof activity !== 'object') return '';
+    const parts = [];
+
+    if (activity.BATTLE_COMPLETED?.length) {
+      parts.push(`Completed Battles: ${activity.BATTLE_COMPLETED.map((b) => `${b.battleType} ${b.battleId}`).join(', ')}`);
+    }
+    if (activity.IU_COMPLETED?.length) {
+      parts.push(`IU Courses Completed: ${activity.IU_COMPLETED.map((c) => c.iuCourse).join(', ')}`);
+    }
+    if (activity.SUBMITTED_BATTLE_REVIEW?.length) {
+      parts.push(`Submitted Reviews: ${activity.SUBMITTED_BATTLE_REVIEW.map((r) => `${r.battleType} ${r.battleId}`).join(', ')}`);
+    }
+    if (activity.NEW_COMBAT_RATING?.length) {
+      parts.push(`New Combat Rating: ${activity.NEW_COMBAT_RATING.map((r) => r.combatRating).join(', ')}`);
+    }
+    if (activity.NEW_FCHG?.length) {
+      parts.push(`${activity.NEW_FCHG.map((r) => r.activityString).join(', ')}`);
+    }
+    if (activity.NEW_COOP_RATING?.length) {
+      parts.push(`New PvE Rating: ${activity.NEW_COOP_RATING.map((r) => r.rating).join(', ')}`);
+    }
+    if (activity.NEW_COMPETITION?.length) {
+      parts.push(`Submitted Approved Competitions: ${activity.NEW_COMPETITION.map((c) => c.activityString).join(', ')}`);
+    }
+    if (activity.CREATED_BATTLE?.length) {
+      parts.push(`Created Battle: ${activity.CREATED_BATTLE.map((b) => `${b.battleType} ${b.battleId}`).join(', ')}`);
+    }
+    if (activity.SUBMITTED_FICTION?.length) {
+      parts.push(`Submitted Fiction: ${activity.SUBMITTED_FICTION.map((f) => f.title).join(', ')}`);
+    }
+    if (activity.SUBMITTED_PATCH_BUG_REPORT?.length) {
+      parts.push(`Submitted Patch Bug Report: ${activity.SUBMITTED_PATCH_BUG_REPORT.map((r) => r.activityString).join(', ')}`);
+    }
+    if (activity.SUBMITTED_BATTLE_BUG_REPORT?.length) {
+      parts.push(`Submitted Battle Bug Report: ${activity.SUBMITTED_BATTLE_BUG_REPORT.map((r) => r.activityString).join(', ')}`);
+    }
+    if (activity.NEW_UNIFORM_APPROVED?.length) {
+      parts.push('Updated Uniform');
+    }
+    if (activity.UPDATED_INPR?.length) {
+      parts.push('Updated INPR');
+    }
+
+    return parts.join('; ');
+  }
+
   async function loadData() {
     setLoading(true);
     setLoadError(null);
@@ -462,12 +528,17 @@ export default function ReportEditorV2() {
 
       setActivityData(merged);
 
-      // Pre-populate pilot activity keys, preserving any already-typed values
+      // Pre-populate pilot activity keys, preserving any already-typed values.
+      // Prefill flightActivity with a formatted summary from the gonk activity data.
       setPilotActivity((prev) => {
         const next = { ...prev };
-        merged.forEach(({ PIN }) => {
-          if (!next[PIN]) {
-            next[PIN] = { communication: '', flightActivity: '', notes: '' };
+        merged.forEach((pilot) => {
+          if (!next[pilot.PIN]) {
+            next[pilot.PIN] = {
+              communication: '',
+              flightActivity: formatActivitySummary(pilot.activity),
+              notes: '',
+            };
           }
         });
         return next;
