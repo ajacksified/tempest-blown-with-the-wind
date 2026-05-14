@@ -94,7 +94,10 @@ export default function ReportEditorV2() {
   const [copyLabel, setCopyLabel] = useState('Copy HTML');
 
   // Live config — populated from squadron API on load
-  const [liveConfig, setLiveConfig] = useState(config);
+  const [liveConfig, setLiveConfig] = useState({
+    ...config,
+    uniformUrl: 'https://tempest-blown-with-the-wind.vercel.app/uniform.jpg',
+  });
 
   // Squadron ID — saved/restored via cookie; defaults to config fallback
   const [squadronId, setSquadronId] = useState(String(config.squadronId ?? '45'));
@@ -123,7 +126,7 @@ export default function ReportEditorV2() {
   const [citationsChange, setCitationsChange] = useState(DEFAULT_CITATIONS_CHANGE);
 
   // Uniform image URL (filled in manually by the CMDR until the API provides it)
-  const [uniformUrl, setUniformUrl] = useState('');
+  // Stored in liveConfig.uniformUrl — no separate state needed
 
   // Pilot data
   const [activityData, setActivityData] = useState([]);
@@ -264,7 +267,8 @@ export default function ReportEditorV2() {
 
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <ReportSidebar
-            uniformUrl={uniformUrl} onUniformUrlChange={setUniformUrl}
+            uniformUrl={liveConfig.uniformUrl}
+            onUniformUrlChange={(u) => setLiveConfig((prev) => ({ ...prev, uniformUrl: u }))}
             accentColor={liveConfig.colorHelmetBase ?? '#2a499c'}
             onAccentColorChange={(c) => setLiveConfig((prev) => ({ ...prev, colorHelmetBase: c }))}
             orders={orders} onOrdersChange={setOrders}
@@ -293,7 +297,7 @@ export default function ReportEditorV2() {
                 >
                   <img
                     style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
-                    src={uniformUrl || 'https://tempest-blown-with-the-wind.vercel.app/uniform.jpg'}
+                    src={liveConfig.uniformUrl}
                     alt={`The uniform of ${liveConfig.cmdr?.name}`}
                   />
                 </a>
