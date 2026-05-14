@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import T from 'prop-types';
 import styles from './styles';
 import { useConfig } from '../src/configContext';
@@ -9,14 +10,28 @@ function formatDate(iso) {
   return `${parseInt(day, 10)} ${MONTHS[parseInt(month, 10) - 1]} ${year}`;
 }
 
-export default function Heading({ reportNumber, submissionDate, statusLine }) {
+export default function Heading({ title, onTitleChange, submissionDate, statusLine }) {
   const config = useConfig();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current && ref.current.textContent !== title) {
+      ref.current.textContent = title;
+    }
+  }, [title]);
+
   return (
     <header style={styles.header}>
       <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '.08em', fontSize: '.8rem', opacity: 0.7, color: styles.green }}>
         {`${config.squadron} Squadron Report`}
       </p>
-      <h1 style={styles.h1}>{config.reportTitleFormat(reportNumber)}</h1>
+      <h1
+        ref={ref}
+        style={styles.h1}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={(e) => onTitleChange(e.currentTarget.textContent)}
+      />
       <p style={{ margin: '.25rem 0', opacity: 0.85 }}>
         {'Submitted by '}
         <strong>{config.cmdr?.title}</strong>
@@ -32,7 +47,8 @@ export default function Heading({ reportNumber, submissionDate, statusLine }) {
 }
 
 Heading.propTypes = {
-  reportNumber: T.number.isRequired,
+  title: T.string.isRequired,
+  onTitleChange: T.func.isRequired,
   submissionDate: T.string,
   statusLine: T.string,
 };

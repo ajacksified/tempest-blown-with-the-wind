@@ -25,20 +25,7 @@ import Link from '../../components/link';
 // Default state
 // ---------------------------------------------------------------------------
 
-const DEFAULT_REPORT_NUMBER = 0;
-
-function isoDate(d) {
-  return d.toISOString().slice(0, 10);
-}
-
-const _today = new Date();
-const _yesterday = new Date(_today); _yesterday.setDate(_today.getDate() - 1);
-const _eightDaysAgo = new Date(_today); _eightDaysAgo.setDate(_today.getDate() - 8);
-
-const DEFAULT_START_DATE = isoDate(_eightDaysAgo);
-const DEFAULT_END_DATE = isoDate(_yesterday);
-const DEFAULT_SUBMISSION_DATE = isoDate(_today);
-
+const DEFAULT_TITLE = 'Tempestuous Transmission #0';
 const DEFAULT_CITATIONS = [];
 const DEFAULT_CITATIONS_CHANGE = '+0';
 const DEFAULT_ORDERS = [
@@ -78,18 +65,17 @@ export default function ReportEditorV2() {
   const reportContentRef = useRef(null);
   const [copyLabel, setCopyLabel] = useState('Copy HTML');
 
-  // Live config — updated optimistically as the sidebar ConfigEditor changes
+  // Live config — populated from squadron API on load
   const [liveConfig, setLiveConfig] = useState(config);
-  const handleConfigChange = useCallback((raw) => setLiveConfig(processConfig(raw)), []);
 
   // Squadron ID — drives the API fetch; defaults from config, editable in toolbar
   const [squadronId, setSquadronId] = useState(String(config.squadronId ?? '45'));
 
-  // Report metadata
-  const [reportNumber, setReportNumber] = useState(DEFAULT_REPORT_NUMBER);
-  const [startDate, setStartDate] = useState(DEFAULT_START_DATE);
-  const [endDate, setEndDate] = useState(DEFAULT_END_DATE);
-  const [submissionDate, setSubmissionDate] = useState(DEFAULT_SUBMISSION_DATE);
+  // Report content
+  const [title, setTitle] = useState(DEFAULT_TITLE);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [submissionDate, setSubmissionDate] = useState('');
   const [statusLine, setStatusLine] = useState('');
 
   // Prose sections
@@ -214,7 +200,6 @@ export default function ReportEditorV2() {
     <div style={editorWrapStyle}>
       <ReportToolbar
         squadronId={squadronId} onSquadronIdChange={setSquadronId}
-        reportNumber={reportNumber} onReportNumberChange={setReportNumber}
         startDate={startDate} onStartDateChange={setStartDate}
         endDate={endDate} onEndDateChange={setEndDate}
         submissionDate={submissionDate} onSubmissionDateChange={setSubmissionDate}
@@ -225,7 +210,6 @@ export default function ReportEditorV2() {
 
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <ReportSidebar
-          onConfigChange={handleConfigChange}
           orders={orders} onOrdersChange={setOrders}
           competitions={competitions} onCompetitionsChange={setCompetitions}
           citations={citations} citationsChange={citationsChange}
@@ -235,8 +219,9 @@ export default function ReportEditorV2() {
         <ConfigContext.Provider value={liveConfig}>
           <div ref={reportContentRef} style={reportPaneStyle}>
             <Heading
-              reportNumber={reportNumber}
-              submissionDate={submissionDate}
+              title={title}
+              onTitleChange={setTitle}
+              submissionDate={submissionDate || null}
               statusLine={statusLine || null}
             />
 

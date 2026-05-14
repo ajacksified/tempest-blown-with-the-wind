@@ -1,5 +1,4 @@
 import T from 'prop-types';
-import ConfigEditor from './configEditor';
 import OrdersForm from './ordersForm';
 import CompetitionsForm from './competitionsForm';
 import CitationsForm from './citationsForm';
@@ -21,17 +20,12 @@ const sidebarStyle = {
 };
 
 export default function ReportSidebar({
-  onConfigChange,
   orders, onOrdersChange,
   competitions, onCompetitionsChange,
   citations, citationsChange, onCitationsChange, onCitationsChangeChange,
 }) {
   return (
     <div data-editor-only="true" style={sidebarStyle}>
-      <ConfigEditor onChange={onConfigChange} />
-
-      <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
-
       <span style={sidebarSectionHead}>Orders</span>
       <OrdersForm orders={orders} onChange={onOrdersChange} />
 
@@ -57,7 +51,6 @@ export default function ReportSidebar({
 }
 
 ReportSidebar.propTypes = {
-  onConfigChange: T.func.isRequired,
   orders: T.arrayOf(T.object).isRequired,
   onOrdersChange: T.func.isRequired,
   competitions: T.arrayOf(T.object).isRequired,

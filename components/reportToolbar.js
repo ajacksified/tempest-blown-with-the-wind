@@ -16,7 +16,6 @@ const toolbarStyle = {
 
 export default function ReportToolbar({
   squadronId, onSquadronIdChange,
-  reportNumber, onReportNumberChange,
   startDate, onStartDateChange,
   endDate, onEndDateChange,
   submissionDate, onSubmissionDateChange,
@@ -41,16 +40,6 @@ export default function ReportToolbar({
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
-      </label>
-
-      <label style={labelStyle}>
-        #
-        <input
-          type="number"
-          value={reportNumber}
-          onChange={(e) => onReportNumberChange(Number(e.target.value))}
-          style={{ ...inputStyle, width: '60px', marginLeft: '4px' }}
-        />
       </label>
 
       <label style={labelStyle}>
@@ -97,8 +86,6 @@ export default function ReportToolbar({
 ReportToolbar.propTypes = {
   squadronId: T.oneOfType([T.string, T.number]).isRequired,
   onSquadronIdChange: T.func.isRequired,
-  reportNumber: T.number.isRequired,
-  onReportNumberChange: T.func.isRequired,
   startDate: T.string.isRequired,
   onStartDateChange: T.func.isRequired,
   endDate: T.string.isRequired,

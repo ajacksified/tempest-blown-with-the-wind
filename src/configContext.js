@@ -2,12 +2,7 @@ import { createContext, useContext } from 'react';
 import staticConfig from '../config';
 
 export function processConfig(raw) {
-  return {
-    ...raw,
-    reportTitleFormat: typeof raw.reportTitleFormat === 'function'
-      ? raw.reportTitleFormat
-      : (number) => String(raw.reportTitleFormat ?? '').replace('{{number}}', number),
-  };
+  return { ...raw };
 }
 
 export const ConfigContext = createContext(staticConfig);
