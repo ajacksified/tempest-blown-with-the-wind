@@ -71,8 +71,23 @@ const reportPaneStyle = {
 };
 
 // ---------------------------------------------------------------------------
-// Main editor page
+// Cookie helpers
 // ---------------------------------------------------------------------------
+
+const COOKIE_KEY = 'squadronId';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+function readSquadronCookie() {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)squadronId=(\d+)/);
+  return match ? match[1] : null;
+}
+
+function writeSquadronCookie(id) {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${COOKIE_KEY}=${id}; max-age=${COOKIE_MAX_AGE}; path=/; SameSite=Lax`;
+}
+
 
 export default function ReportEditorV2() {
   const reportContentRef = useRef(null);
@@ -81,8 +96,13 @@ export default function ReportEditorV2() {
   // Live config — populated from squadron API on load
   const [liveConfig, setLiveConfig] = useState(config);
 
-  // Squadron ID — drives the API fetch; defaults from config, editable in toolbar
+  // Squadron ID — saved/restored via cookie; defaults to config fallback
   const [squadronId, setSquadronId] = useState(String(config.squadronId ?? '45'));
+
+  function handleSquadronIdChange(id) {
+    setSquadronId(id);
+    writeSquadronCookie(id);
+  }
 
   // Report content
   const [title, setTitle] = useState(DEFAULT_TITLE);
@@ -133,19 +153,29 @@ export default function ReportEditorV2() {
       });
   }, [squadronId, applySquadronData]);
 
+  // On mount: restore saved squadron from cookie, then trigger initial data load
+  useEffect(() => {
+    const saved = readSquadronCookie();
+    const initId = saved ?? String(config.squadronId ?? '45');
+    if (saved && saved !== squadronId) {
+      setSquadronId(saved);
+    }
+    loadData(initId); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // -------------------------------------------------------------------------
   // Load gonk + squadron data
   // -------------------------------------------------------------------------
 
-  async function loadData() {
+  async function loadData(sqnId = squadronId) {
     setLoading(true);
     setLoadError(null);
     try {
       const squadronData = await fetch(
-        `https://api.emperorshammer.org/squadron/${squadronId}`,
+        `https://api.emperorshammer.org/squadron/${sqnId}`,
       ).then((r) => r.json());
 
-      const fleetEntry = fleet.squadrons.find((s) => String(s.id) === String(squadronId));
+      const fleetEntry = fleet.squadrons.find((s) => String(s.id) === String(sqnId));
       applySquadronData(squadronData, fleetEntry);
 
       const pilotData = await Promise.all(
@@ -220,7 +250,7 @@ export default function ReportEditorV2() {
       </style>
       <div style={editorWrapStyle}>
         <ReportToolbar
-          squadronId={squadronId} onSquadronIdChange={setSquadronId}
+          squadronId={squadronId} onSquadronIdChange={handleSquadronIdChange}
           startDate={startDate} onStartDateChange={setStartDate}
           endDate={endDate} onEndDateChange={setEndDate}
           submissionDate={submissionDate} onSubmissionDateChange={setSubmissionDate}
