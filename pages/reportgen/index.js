@@ -26,6 +26,19 @@ import Link from '../../components/link';
 // ---------------------------------------------------------------------------
 
 const DEFAULT_TITLE = 'Tempestuous Transmission #0';
+
+function isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+const _today = new Date();
+const _yesterday = new Date(_today); _yesterday.setDate(_today.getDate() - 1);
+const _eightDaysAgo = new Date(_today); _eightDaysAgo.setDate(_today.getDate() - 8);
+
+const DEFAULT_START_DATE = isoDate(_eightDaysAgo);
+const DEFAULT_END_DATE = isoDate(_yesterday);
+const DEFAULT_SUBMISSION_DATE = isoDate(_today);
+
 const DEFAULT_CITATIONS = [];
 const DEFAULT_CITATIONS_CHANGE = '+0';
 const DEFAULT_ORDERS = [
@@ -73,9 +86,9 @@ export default function ReportEditorV2() {
 
   // Report content
   const [title, setTitle] = useState(DEFAULT_TITLE);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [submissionDate, setSubmissionDate] = useState('');
+  const [startDate, setStartDate] = useState(DEFAULT_START_DATE);
+  const [endDate, setEndDate] = useState(DEFAULT_END_DATE);
+  const [submissionDate, setSubmissionDate] = useState(DEFAULT_SUBMISSION_DATE);
   const [statusLine, setStatusLine] = useState('');
 
   // Prose sections
@@ -197,75 +210,84 @@ export default function ReportEditorV2() {
   // -------------------------------------------------------------------------
 
   return (
-    <div style={editorWrapStyle}>
-      <ReportToolbar
-        squadronId={squadronId} onSquadronIdChange={setSquadronId}
-        startDate={startDate} onStartDateChange={setStartDate}
-        endDate={endDate} onEndDateChange={setEndDate}
-        submissionDate={submissionDate} onSubmissionDateChange={setSubmissionDate}
-        statusLine={statusLine} onStatusLineChange={setStatusLine}
-        loading={loading} loadError={loadError} onLoadData={loadData}
-        copyLabel={copyLabel} onCopyHtml={copyHtml}
-      />
-
-      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-        <ReportSidebar
-          orders={orders} onOrdersChange={setOrders}
-          competitions={competitions} onCompetitionsChange={setCompetitions}
-          citations={citations} citationsChange={citationsChange}
-          onCitationsChange={setCitations} onCitationsChangeChange={setCitationsChange}
+    <>
+      <style>
+        {`
+[contenteditable="true"] {
+  border: dashed 1px rgba(255,255,255,.15);
+}
+        `}
+      </style>
+      <div style={editorWrapStyle}>
+        <ReportToolbar
+          squadronId={squadronId} onSquadronIdChange={setSquadronId}
+          startDate={startDate} onStartDateChange={setStartDate}
+          endDate={endDate} onEndDateChange={setEndDate}
+          submissionDate={submissionDate} onSubmissionDateChange={setSubmissionDate}
+          statusLine={statusLine} onStatusLineChange={setStatusLine}
+          loading={loading} loadError={loadError} onLoadData={loadData}
+          copyLabel={copyLabel} onCopyHtml={copyHtml}
         />
 
-        <ConfigContext.Provider value={liveConfig}>
-          <div ref={reportContentRef} style={reportPaneStyle}>
-            <Heading
-              title={title}
-              onTitleChange={setTitle}
-              submissionDate={submissionDate || null}
-              statusLine={statusLine || null}
-            />
+        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+          <ReportSidebar
+            orders={orders} onOrdersChange={setOrders}
+            competitions={competitions} onCompetitionsChange={setCompetitions}
+            citations={citations} citationsChange={citationsChange}
+            onCitationsChange={setCitations} onCitationsChangeChange={setCitationsChange}
+          />
 
-            <Nav />
+          <ConfigContext.Provider value={liveConfig}>
+            <div ref={reportContentRef} style={reportPaneStyle}>
+              <Heading
+                title={title}
+                onTitleChange={setTitle}
+                submissionDate={submissionDate || null}
+                statusLine={statusLine || null}
+              />
 
-            <section id="transmission" aria-labelledby="transmission-heading" style={styles.sectionBlock}>
-              <p id="transmission-heading" style={styles.sectionPrefix}>[COMM] TRANSMISSION // PRIORITY: ROUTINE</p>
-              <a
-                href={`https://tc.emperorshammer.org/record.php?pin=${liveConfig.cmdr?.pin}&type=profile`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <img
-                  style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
-                  src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
-                  alt={`The uniform of ${liveConfig.cmdr?.name}`}
-                />
-              </a>
-              <EditableText value={introHtml} onChange={setIntroHtml} />
-            </section>
+              <Nav />
 
-            <Orders missions={orders}>
-              <EditableText value={ordersNoteHtml} onChange={setOrdersNoteHtml} />
-            </Orders>
+              <section id="transmission" aria-labelledby="transmission-heading" style={styles.sectionBlock}>
+                <p id="transmission-heading" style={styles.sectionPrefix}>[COMM] TRANSMISSION // PRIORITY: ROUTINE</p>
+                <a
+                  href={`https://tc.emperorshammer.org/record.php?pin=${liveConfig.cmdr?.pin}&type=profile`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img
+                    style={{ width: '100%', maxWidth: '190px', float: 'right', marginLeft: '1rem' }}
+                    src="https://tempest-blown-with-the-wind.vercel.app/uniform.jpg"
+                    alt={`The uniform of ${liveConfig.cmdr?.name}`}
+                  />
+                </a>
+                <EditableText value={introHtml} onChange={setIntroHtml} />
+              </section>
 
-            <Recognition activityData={activityData} />
+              <Orders missions={orders}>
+                <EditableText value={ordersNoteHtml} onChange={setOrdersNoteHtml} />
+              </Orders>
 
-            <EditableActivity
-              activityData={activityData}
-              pilotActivity={pilotActivity}
-              onPilotChange={handlePilotChange}
-            />
+              <Recognition activityData={activityData} />
 
-            <Competitions competitions={competitions} />
+              <EditableActivity
+                activityData={activityData}
+                pilotActivity={pilotActivity}
+                onPilotChange={handlePilotChange}
+              />
 
-            <Citations citations={citations} citationsChange={citationsChange} />
+              <Competitions competitions={competitions} />
 
-            <Footer />
-            <Closing>
-              <EditableText value={closingHtml} onChange={setClosingHtml} />
-            </Closing>
-          </div>
-        </ConfigContext.Provider>
+              <Citations citations={citations} citationsChange={citationsChange} />
+
+              <Footer />
+              <Closing>
+                <EditableText value={closingHtml} onChange={setClosingHtml} />
+              </Closing>
+            </div>
+          </ConfigContext.Provider>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
