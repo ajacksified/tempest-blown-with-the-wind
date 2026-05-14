@@ -20,8 +20,8 @@ const box = (...lines) => [
 
 const HEADER = box(
   '',
-  "   EMPEROR'S HAMMER  //  TEMPEST SQUADRON  (#45)",
-  '   IMPERIAL INTRANET NODE  --  WING I, ISDII CHALLENGE',
+  "   EMPEROR'S HAMMER  //  TEMPEST SQUADRON ",
+  '   IMPERIAL INTRANET NODE  --  WING X, ISDII CHALLENGE',
   '',
 );
 
