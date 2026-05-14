@@ -41,12 +41,6 @@ const sectionHeadingStyle = {
   paddingBottom: '3px',
 };
 
-const gridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-  gap: '0.5em',
-};
-
 function Field({ label, value, onChange, type = 'text', hint }) {
   return (
     <div style={fieldStyle}>
@@ -108,55 +102,6 @@ PersonSection.propTypes = {
     intro: T.string,
     email: T.string,
   }).isRequired,
-  onChange: T.func.isRequired,
-};
-
-function FlightsSection({ flights, onChange }) {
-  function updateFlight(i, key, val) {
-    const next = flights.map((f, fi) => (fi === i ? { ...f, [key]: val } : f));
-    onChange(next);
-  }
-
-  function removeFlight(i) {
-    onChange(flights.filter((_, fi) => fi !== i));
-  }
-
-  function addFlight() {
-    onChange([...flights, { name: '', motto: '', ship: 31 }]);
-  }
-
-  return (
-    <div style={sectionStyle}>
-      <div style={sectionHeadingStyle}>Flights</div>
-      {flights.map((flight, i) => (
-        <div key={`flight-${flight.name || i}`} style={{ marginBottom: '0.75em', paddingLeft: '0.5em', borderLeft: '2px solid #333' }}>
-          <div style={{ ...gridStyle, marginBottom: '0.25em' }}>
-            <Field label={`Flight ${i + 1} Name`} value={flight.name} onChange={(v) => updateFlight(i, 'name', v)} />
-            <Field label="Ship ID" value={flight.ship} onChange={(v) => updateFlight(i, 'ship', v)} type="number" />
-          </div>
-          <Field label="Motto" value={flight.motto} onChange={(v) => updateFlight(i, 'motto', v)} />
-          <button
-            type="button"
-            onClick={() => removeFlight(i)}
-            style={{ ...buttonStyle, backgroundColor: '#550000', color: '#fff', fontSize: '11px', padding: '0.2em 0.6em' }}
-          >
-            Remove Flight
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={addFlight}
-        style={{ ...buttonStyle, backgroundColor: '#003366', color: '#fff', marginTop: '0.25em' }}
-      >
-        + Add Flight
-      </button>
-    </div>
-  );
-}
-
-FlightsSection.propTypes = {
-  flights: T.arrayOf(T.shape({ name: T.string, motto: T.string, ship: T.number })).isRequired,
   onChange: T.func.isRequired,
 };
 
@@ -230,32 +175,22 @@ export default function ConfigEditor({ onChange }) {
               {/* Report title */}
               <div style={sectionStyle}>
                 <div style={sectionHeadingStyle}>Report</div>
-                <div style={gridStyle}>
-                  <Field
-                    label="Title Format"
-                    value={config.reportTitleFormat}
-                    onChange={(v) => set('reportTitleFormat', v)}
-                    hint="Use {{number}} for the report number"
-                  />
-                  <Field label="Squadron" value={config.squadron} onChange={(v) => set('squadron', v)} />
-                  <Field label="Ship" value={config.ship} onChange={(v) => set('ship', v)} />
-                  <Field label="Squadron ID" value={config.squadronId} onChange={(v) => set('squadronId', v)} />
-                </div>
+                <Field
+                  label="Title Format"
+                  value={config.reportTitleFormat}
+                  onChange={(v) => set('reportTitleFormat', v)}
+                  hint="Use {{number}} for the report number"
+                />
               </div>
 
-              {/* Images */}
+              {/* CMDR intro line */}
               <div style={sectionStyle}>
-                <div style={sectionHeadingStyle}>Images</div>
-                <Field label="Banner URL" value={config.squadronBanner?.url} onChange={(v) => set('squadronBanner', { ...config.squadronBanner, url: v })} />
-                <Field label="Patch URL" value={config.squadronPatch?.url} onChange={(v) => set('squadronPatch', { ...config.squadronPatch, url: v })} />
+                <div style={sectionHeadingStyle}>CMDR</div>
+                <Field label="Intro Line" value={config.cmdr?.intro} onChange={(v) => set('cmdr', { ...config.cmdr, intro: v })} />
               </div>
 
-              {/* People */}
-              <PersonSection label="CMDR" data={config.cmdr} onChange={(v) => set('cmdr', v)} />
-              <PersonSection label="Battlegroup Commander" data={config.com} onChange={(v) => set('com', v)} />
-
-              {/* Flights */}
-              <FlightsSection flights={config.flights} onChange={(v) => set('flights', v)} />
+              {/* Battlegroup Commander */}
+              <PersonSection label="Battlegroup Commander" data={config.com ?? {}} onChange={(v) => set('com', v)} />
 
               {/* Save */}
               <div style={{ display: 'flex', gap: '1em', alignItems: 'center', marginTop: '0.5em' }}>

@@ -1,5 +1,5 @@
 /* eslint react/no-unescaped-entities: 0 */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 import Heading from '../../components/heading';
 import Nav from '../../components/nav';
@@ -17,6 +17,7 @@ import styles from '../../components/styles';
 import config from '../../config';
 import { ConfigContext, processConfig } from '../../src/configContext';
 import formatActivitySummary from '../../src/formatActivitySummary';
+import mergeSquadronData from '../../src/mergeSquadronData';
 import Link from '../../components/link';
 
 // ---------------------------------------------------------------------------
@@ -80,6 +81,9 @@ export default function ReportEditorV2() {
   const [liveConfig, setLiveConfig] = useState(config);
   const handleConfigChange = useCallback((raw) => setLiveConfig(processConfig(raw)), []);
 
+  // Squadron ID — drives the API fetch; defaults from config, editable in toolbar
+  const [squadronId, setSquadronId] = useState(String(config.squadronId ?? '45'));
+
   // Report metadata
   const [reportNumber, setReportNumber] = useState(DEFAULT_REPORT_NUMBER);
   const [startDate, setStartDate] = useState(DEFAULT_START_DATE);
@@ -105,6 +109,22 @@ export default function ReportEditorV2() {
   const [loadError, setLoadError] = useState(null);
 
   // -------------------------------------------------------------------------
+  // Squadron data — fetch on mount and whenever squadronId changes
+  // -------------------------------------------------------------------------
+
+  const applySquadronData = useCallback((apiResponse) => {
+    setLiveConfig((prev) => processConfig(mergeSquadronData(apiResponse, prev)));
+  }, []);
+
+  useEffect(() => {
+    if (!squadronId) return;
+    fetch(`https://api.emperorshammer.org/squadron/${squadronId}`)
+      .then((r) => r.json())
+      .then(applySquadronData)
+      .catch(() => {}); // non-fatal; config.json values remain
+  }, [squadronId, applySquadronData]);
+
+  // -------------------------------------------------------------------------
   // Load gonk + squadron data
   // -------------------------------------------------------------------------
 
@@ -113,8 +133,10 @@ export default function ReportEditorV2() {
     setLoadError(null);
     try {
       const squadronData = await fetch(
-        `https://api.emperorshammer.org/squadron/${liveConfig.squadronId}`,
+        `https://api.emperorshammer.org/squadron/${squadronId}`,
       ).then((r) => r.json());
+
+      applySquadronData(squadronData);
 
       const pilotData = await Promise.all(
         squadronData.pilots.map(({ PIN: pin }) => fetch(
@@ -180,6 +202,7 @@ export default function ReportEditorV2() {
   return (
     <div style={editorWrapStyle}>
       <ReportToolbar
+        squadronId={squadronId} onSquadronIdChange={setSquadronId}
         reportNumber={reportNumber} onReportNumberChange={setReportNumber}
         startDate={startDate} onStartDateChange={setStartDate}
         endDate={endDate} onEndDateChange={setEndDate}
