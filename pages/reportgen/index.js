@@ -18,6 +18,7 @@ import config from '../../config';
 import { ConfigContext, processConfig } from '../../src/configContext';
 import formatActivitySummary from '../../src/formatActivitySummary';
 import mergeSquadronData from '../../src/mergeSquadronData';
+import fleet from '../../src/fleet.json';
 import Link from '../../components/link';
 
 // ---------------------------------------------------------------------------
@@ -112,16 +113,26 @@ export default function ReportEditorV2() {
   // Squadron data — fetch on mount and whenever squadronId changes
   // -------------------------------------------------------------------------
 
-  const applySquadronData = useCallback((apiResponse) => {
-    setLiveConfig((prev) => processConfig(mergeSquadronData(apiResponse, prev)));
+  const applySquadronData = useCallback((apiResponse, fleetEntry) => {
+    setLiveConfig((prev) => processConfig(mergeSquadronData(apiResponse, prev, fleetEntry)));
   }, []);
 
   useEffect(() => {
     if (!squadronId) return;
+    const fleetEntry = fleet.squadrons.find((s) => String(s.id) === String(squadronId));
     fetch(`https://api.emperorshammer.org/squadron/${squadronId}`)
       .then((r) => r.json())
-      .then(applySquadronData)
-      .catch(() => {}); // non-fatal; config.json values remain
+      .then((data) => applySquadronData(data, fleetEntry))
+      .catch(() => {
+        // API failed but we can still apply the fleet color immediately
+        if (fleetEntry) {
+          setLiveConfig((prev) => processConfig({
+            ...prev,
+            colorHelmetBase: fleetEntry.uniformData.colorHelmetBase,
+            colorHelmetDecoration: fleetEntry.uniformData.colorHelmetDecoration,
+          }));
+        }
+      });
   }, [squadronId, applySquadronData]);
 
   // -------------------------------------------------------------------------
@@ -136,7 +147,8 @@ export default function ReportEditorV2() {
         `https://api.emperorshammer.org/squadron/${squadronId}`,
       ).then((r) => r.json());
 
-      applySquadronData(squadronData);
+      const fleetEntry = fleet.squadrons.find((s) => String(s.id) === String(squadronId));
+      applySquadronData(squadronData, fleetEntry);
 
       const pilotData = await Promise.all(
         squadronData.pilots.map(({ PIN: pin }) => fetch(

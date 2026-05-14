@@ -1,45 +1,14 @@
 {
   "reportTitleFormat": "Tempestuous Transmission #{{number}}",
-  "ship": "ISD-II Challenge",
-  "squadron": "Tempest",
   "squadronId": "45",
-  "squadronPatch": {
-    "url": "https://tc.emperorshammer.org/images/patches/35528Tempest%20Squadron%20Patch%202020.png",
-    "height": 128,
-    "width": 128
-  },
-  "squadronBanner": {
-    "url": "https://tc.emperorshammer.org/images/banners/35528tempest.jpeg",
-    "height": 384,
-    "width": 512
-  },
+  "colorHelmetBase": "#2a499c",
+  "colorHelmetDecoration": "#fa9459",
   "cmdr": {
-    "intro": "From the Desk of Silwar Naiilo",
-    "name": "Silwar Naiilo",
-    "title": "GN Silwar Naiilo",
-    "pin": 12630,
-    "email": "ehsilwar@gmail.com"
+    "intro": "From the Desk of Silwar Naiilo"
   },
   "com": {
     "name": "Locke Setzer",
     "title": "AD Locke Setzer",
     "pin": 4541
-  },
-  "flights": [
-    {
-      "name": "Storm Knights",
-      "motto": "With this lance I judge, for he that dies pays all debts",
-      "ship": 5
-    },
-    {
-      "name": "Heralds of Maelstrom",
-      "motto": "Hell is empty, and all the devils are here",
-      "ship": 249
-    },
-    {
-      "name": "Paladins of Fulmination",
-      "motto": "You'll see the lightning but will be dead before the thunder",
-      "ship": 249
-    }
-  ]
+  }
 }

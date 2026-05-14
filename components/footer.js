@@ -5,6 +5,7 @@ import { useConfig } from '../src/configContext';
 
 export default function Footer({ children }) {
   const config = useConfig();
+  const listItemLinkStyle = { ...styles.listItemLink, backgroundColor: config.colorHelmetBase ?? styles.listItemLink.backgroundColor };
 
   const links = [{
     href: 'https://discord.gg/MSxYV8a',
@@ -31,7 +32,7 @@ export default function Footer({ children }) {
       <ul style={styles.list}>
         {links.map(({ href, title }) => (
           <li key={href} style={styles.listItem}>
-            <Link href={href} target="_blank" rel="noreferrer" style={styles.listItemLink}>{title}</Link>
+            <Link href={href} target="_blank" rel="noreferrer" style={listItemLinkStyle}>{title}</Link>
           </li>
         ))}
       </ul>

@@ -1,0 +1,139 @@
+{
+  "squadrons": [
+    {
+      "id": 7,
+      "name": "Alpha",
+      "nameShort": "Alpha",
+      "uniformData": {
+        "colorHelmetBase": "#061b47",
+        "colorHelmetDecoration": "#005fa8"
+      }
+    },
+    {
+      "id": 10,
+      "name": "Delta",
+      "nameShort": "Delta",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#939393"
+      }
+    },
+    {
+      "id": 11,
+      "name": "Epsilon",
+      "nameShort": "Epsilon",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#939393"
+      }
+    },
+    {
+      "id": 139,
+      "name": "Firebird",
+      "nameShort": "Firebird",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#fa6400"
+      }
+    },
+    {
+      "id": 9,
+      "name": "Gamma",
+      "nameShort": "Gamma",
+      "uniformData": {
+        "colorHelmetBase": "#050866",
+        "colorHelmetDecoration": "#e8af13"
+      }
+    },
+    {
+      "id": 13,
+      "name": "Kappa",
+      "nameShort": "Kappa",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#000000"
+      }
+    },
+    {
+      "id": 12,
+      "name": "Lambda",
+      "nameShort": "Lambda",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#939393"
+      }
+    },
+    {
+      "id": 15,
+      "name": "Rho",
+      "nameShort": "Rho",
+      "uniformData": {
+        "colorHelmetBase": "#1a1a1a",
+        "colorHelmetDecoration": "#595656"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Scorpion",
+      "nameShort": "Scorpion",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#939393"
+      }
+    },
+    {
+      "id": 64,
+      "name": "Sin",
+      "nameShort": "Sin",
+      "uniformData": {
+        "colorHelmetBase": "#710000",
+        "colorHelmetDecoration": "#af9200"
+      }
+    },
+    {
+      "id": 78,
+      "name": "Spear",
+      "nameShort": "Spear",
+      "uniformData": {
+        "colorHelmetBase": "#171717",
+        "colorHelmetDecoration": "#97077d"
+      }
+    },
+    {
+      "id": 57,
+      "name": "Spectre",
+      "nameShort": "Spectre",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#939393"
+      }
+    },
+    {
+      "id": 45,
+      "name": "Tempest",
+      "nameShort": "Tempest",
+      "uniformData": {
+        "colorHelmetBase": "#2a499c",
+        "colorHelmetDecoration": "#fa9459"
+      }
+    },
+    {
+      "id": 65,
+      "name": "Theta",
+      "nameShort": "Theta",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#ed1c24"
+      }
+    },
+    {
+      "id": 41,
+      "name": "Typhoon",
+      "nameShort": "Typhoon",
+      "uniformData": {
+        "colorHelmetBase": "#212121",
+        "colorHelmetDecoration": "#00006b"
+      }
+    }
+  ]
+}

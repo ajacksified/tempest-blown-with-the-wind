@@ -1,8 +1,11 @@
 import T from 'prop-types';
 import Link from './link';
 import styles from './styles';
+import { useConfig } from '../src/configContext';
 
 export default function Orders({ missions, children }) {
+  const { colorHelmetBase } = useConfig();
+  const listItemLinkStyle = { ...styles.listItemLink, backgroundColor: colorHelmetBase ?? styles.listItemLink.backgroundColor };
   return (
     <section id="orders" aria-labelledby="orders-heading" style={styles.sectionBlock}>
       <p id="orders-heading" style={styles.sectionPrefix}>[COO] ACTIVE DIRECTIVES</p>
@@ -16,7 +19,7 @@ export default function Orders({ missions, children }) {
               href={`https://tc.emperorshammer.org/download.php?id=${m.id}&type=info`}
               target="_blank"
               rel="noreferrer"
-              style={styles.listItemLink}
+              style={listItemLinkStyle}
             >
               {m.name}
             </Link>

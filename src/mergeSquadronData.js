@@ -7,7 +7,7 @@
  * @param {object} baseConfig  - Current config (used for fields not in the API)
  * @returns {object} Merged config
  */
-export default function mergeSquadronData(apiResponse, baseConfig) {
+export default function mergeSquadronData(apiResponse, baseConfig, fleetEntry = null) {
   const { squadron, pilots = [] } = apiResponse;
 
   const cmdrPilot = pilots.find((p) => p.position === 'CMDR');
@@ -38,5 +38,7 @@ export default function mergeSquadronData(apiResponse, baseConfig) {
       } : {}),
     },
     flights: flights.length > 0 ? flights : (baseConfig.flights ?? []),
+    colorHelmetBase: fleetEntry?.uniformData?.colorHelmetBase ?? baseConfig.colorHelmetBase,
+    colorHelmetDecoration: fleetEntry?.uniformData?.colorHelmetDecoration ?? baseConfig.colorHelmetDecoration,
   };
 }

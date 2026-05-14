@@ -5,6 +5,7 @@ import { useConfig } from '../src/configContext';
 
 export default function Competitions({ competitions }) {
   const config = useConfig();
+  const highlightedLinkStyle = { color: config.colorHelmetBase ?? styles.highlightedLink.color };
   return (
     <section id="competitions" aria-labelledby="competitions-heading" style={styles.sectionBlock}>
       <p id="competitions-heading" style={styles.sectionPrefix}>[COO] ACTIVE THEATERS</p>
@@ -16,7 +17,7 @@ export default function Competitions({ competitions }) {
               href={`https://tc.emperorshammer.org/competitions.php?id=${c.id}`}
               target="_blank"
               rel="noreferrer"
-              style={c.highlight ? styles.highlightedLink : {}}
+              style={c.highlight ? highlightedLinkStyle : {}}
             >
               {c.name}
             </Link>

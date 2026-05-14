@@ -1,13 +1,16 @@
 import T from 'prop-types';
 import styles from './styles';
+import { useConfig } from '../src/configContext';
 
 export default function Link({
   children,
   style,
   ...props
 }) {
+  const { colorHelmetBase } = useConfig();
+  const linkColor = colorHelmetBase ?? styles.a.color;
   return (
-    <a style={{ ...styles.a, ...style }} {...props}>{children}</a>
+    <a style={{ ...styles.a, color: linkColor, ...style }} {...props}>{children}</a>
   );
 }
 

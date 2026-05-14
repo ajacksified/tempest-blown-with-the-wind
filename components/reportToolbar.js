@@ -1,4 +1,5 @@
 import T from 'prop-types';
+import fleet from '../src/fleet.json';
 import editorStyles from '../src/editorStyles';
 
 const { inputStyle, primaryButton, successButton, labelStyle } = editorStyles;
@@ -31,12 +32,15 @@ export default function ReportToolbar({
 
       <label style={labelStyle}>
         Sqn
-        <input
-          type="number"
+        <select
           value={squadronId}
           onChange={(e) => onSquadronIdChange(e.target.value)}
-          style={{ ...inputStyle, width: '52px', marginLeft: '4px' }}
-        />
+          style={{ ...inputStyle, marginLeft: '4px' }}
+        >
+          {fleet.squadrons.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
       </label>
 
       <label style={labelStyle}>
