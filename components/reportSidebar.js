@@ -85,6 +85,10 @@ export default function ReportSidebar({
         onCitationsChange={onCitationsChange}
         onChangeChange={onCitationsChangeChange}
       />
+
+      <span style={sidebarSectionHead}>
+        reportgen v2<br />GN Silwar Naiilo #12630
+      </span>
     </div>
   );
 }
