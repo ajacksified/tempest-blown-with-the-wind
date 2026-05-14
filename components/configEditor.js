@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import T from 'prop-types';
+import editorStyles from '../src/editorStyles';
 
 const inputStyle = {
-  backgroundColor: '#0d0d1a',
-  color: '#ffffff',
-  border: '1px solid #555',
-  padding: '0.3em 0.5em',
-  fontFamily: 'Monospace',
+  ...editorStyles.inputStyle,
   fontSize: '13px',
-  borderRadius: '3px',
   width: '100%',
   boxSizing: 'border-box',
+};
+
+const buttonStyle = {
+  ...editorStyles.buttonStyle,
+  fontSize: '13px',
 };
 
 const labelStyle = {
@@ -38,15 +39,6 @@ const sectionHeadingStyle = {
   marginBottom: '0.5em',
   borderBottom: '1px solid #333',
   paddingBottom: '3px',
-};
-
-const buttonStyle = {
-  padding: '0.4em 1em',
-  cursor: 'pointer',
-  fontFamily: 'Monospace',
-  fontSize: '13px',
-  borderRadius: '3px',
-  border: 'none',
 };
 
 const gridStyle = {
@@ -168,7 +160,7 @@ FlightsSection.propTypes = {
   onChange: T.func.isRequired,
 };
 
-export default function ConfigEditor() {
+export default function ConfigEditor({ onChange }) {
   const [config, setConfig] = useState(null);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -182,7 +174,9 @@ export default function ConfigEditor() {
   }, []);
 
   function set(key, val) {
-    setConfig((prev) => ({ ...prev, [key]: val }));
+    const next = { ...config, [key]: val };
+    setConfig(next);
+    onChange?.(next);
   }
 
   async function save() {
@@ -195,8 +189,8 @@ export default function ConfigEditor() {
         body: JSON.stringify(config),
       });
       if (!res.ok) throw new Error((await res.json()).error);
-      setStatus('Saved! Reloading…');
-      setTimeout(() => window.location.reload(), 600);
+      setStatus('Saved!');
+      setSaving(false);
     } catch (err) {
       setStatus(`Error: ${err.message}`);
       setSaving(false);
@@ -282,3 +276,11 @@ export default function ConfigEditor() {
     </div>
   );
 }
+
+ConfigEditor.propTypes = {
+  onChange: T.func,
+};
+
+ConfigEditor.defaultProps = {
+  onChange: null,
+};

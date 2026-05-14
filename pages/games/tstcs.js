@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import TIEBomberGame from '../../components/TIEBomberGame';
+import TIEBomberGame from '../../components/tieBomberGame';
 import s from '../../styles/games.module.css';
 
 const TITLE_ART = [

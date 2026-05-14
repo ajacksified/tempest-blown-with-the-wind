@@ -1,6 +1,6 @@
 import T from 'prop-types';
 import styles from './styles';
-import config from '../config';
+import { useConfig } from '../src/configContext';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -10,6 +10,7 @@ function formatDate(iso) {
 }
 
 export default function Heading({ reportNumber, submissionDate, statusLine }) {
+  const config = useConfig();
   return (
     <header style={styles.header}>
       <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '.08em', fontSize: '.8rem', opacity: 0.7, color: styles.green }}>

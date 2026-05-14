@@ -1,29 +1,30 @@
 import T from 'prop-types';
 import Link from './link';
 import styles from './styles';
-import config from '../config';
-
-const links = [{
-  href: 'https://discord.gg/MSxYV8a',
-  title: 'TC Discord',
-}, {
-  href: `https://tc.emperorshammer.org/roster.php?type=sqn&id=${config.squadronId}`,
-  title: 'Squadron Page',
-}, {
-  href: `mailto:${config.cmdr.email}`,
-  title: 'Email the CMDR',
-}, {
-  href: 'https://tc.emperorshammer.org/admin.php',
-  title: 'TC Personnel Administration',
-}, {
-  href: 'https://tc.emperorshammer.org/battlecenter.php',
-  title: 'Battle Center',
-}, {
-  href: `https://tc.emperorshammer.org/showreport.php?id=1&nid=${config.squadronId}`,
-  title: 'Report Archive',
-}];
+import { useConfig } from '../src/configContext';
 
 export default function Footer({ children }) {
+  const config = useConfig();
+
+  const links = [{
+    href: 'https://discord.gg/MSxYV8a',
+    title: 'TC Discord',
+  }, {
+    href: `https://tc.emperorshammer.org/roster.php?type=sqn&id=${config.squadronId}`,
+    title: 'Squadron Page',
+  }, {
+    href: `mailto:${config.cmdr.email}`,
+    title: 'Email the CMDR',
+  }, {
+    href: 'https://tc.emperorshammer.org/admin.php',
+    title: 'TC Personnel Administration',
+  }, {
+    href: 'https://tc.emperorshammer.org/battlecenter.php',
+    title: 'Battle Center',
+  }, {
+    href: `https://tc.emperorshammer.org/showreport.php?id=1&nid=${config.squadronId}`,
+    title: 'Report Archive',
+  }];
   return (
     <section style={{ ...styles.sectionBlock, opacity: 0.8 }}>
       <p style={styles.sectionPrefix}>[IU] RESOURCES</p>

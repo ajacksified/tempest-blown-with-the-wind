@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import styles from "./TIEBomberGame.module.css";
+import styles from "./tieBomberGame.module.css";
 
 // ── Grid ────────────────────────────────────────────────────────────────────
 const COLS      = 72;

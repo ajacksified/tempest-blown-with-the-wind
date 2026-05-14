@@ -1,9 +1,10 @@
 import T from 'prop-types';
 import Link from './link';
 import styles from './styles';
-import config from '../config';
+import { useConfig } from '../src/configContext';
 
 export default function Citations({ citations, citationsChange, children }) {
+  const config = useConfig();
   return (
     <section id="citations" aria-labelledby="citations-heading" style={styles.sectionBlock}>
       <p id="citations-heading" style={styles.sectionPrefix}>[TAC] SQUADRON CITATION RECORD</p>

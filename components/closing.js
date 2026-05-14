@@ -1,8 +1,9 @@
 import T from 'prop-types';
 import styles from './styles';
-import config from '../config';
+import { useConfig } from '../src/configContext';
 
 export default function Closing({ children }) {
+  const config = useConfig();
   return (
     <footer style={styles.footer}>
       <p style={styles.sectionPrefix}>[COMM] CLOSING SIGNAL</p>

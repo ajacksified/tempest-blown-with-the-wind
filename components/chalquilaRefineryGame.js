@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import styles from './ChalquilaRefineryGame.module.css';
+import styles from './chalquilaRefineryGame.module.css';
 
 // ── Layout ───────────────────────────────────────────────────────────────────
 const W  = 64; // inner width between box walls

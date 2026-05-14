@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import styles from './LightsaberGame.module.css';
+import styles from './lightsaberGame.module.css';
 
 // ════════════════════════════════════════════════════════════════════════════
 // TUNING — all adjustable values live here

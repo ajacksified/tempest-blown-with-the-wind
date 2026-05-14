@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import ChalquilaRefineryGame from '../../components/ChalquilaRefineryGame';
+import ChalquilaRefineryGame from '../../components/chalquilaRefineryGame';
 import s from '../../styles/games.module.css';
 
 // ── Secondary objectives ──────────────────────────────────────────────────────

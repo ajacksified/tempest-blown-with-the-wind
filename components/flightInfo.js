@@ -1,8 +1,9 @@
 import T from 'prop-types';
-import config from '../config';
+import { useConfig } from '../src/configContext';
 import styles from './styles';
 
 export default function FlightInfo({ flight: flightNumber }) {
+  const config = useConfig();
   const flight = config.flights[flightNumber - 1];
 
   return (

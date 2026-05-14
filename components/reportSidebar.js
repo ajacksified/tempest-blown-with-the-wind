@@ -1,0 +1,69 @@
+import T from 'prop-types';
+import ConfigEditor from './configEditor';
+import OrdersForm from './ordersForm';
+import CompetitionsForm from './competitionsForm';
+import CitationsForm from './citationsForm';
+import editorStyles from '../src/editorStyles';
+
+const { sidebarSectionHead } = editorStyles;
+
+const sidebarStyle = {
+  width: '280px',
+  flexShrink: 0,
+  position: 'sticky',
+  top: 0,
+  maxHeight: '100vh',
+  overflowY: 'auto',
+  backgroundColor: '#0d0d1a',
+  borderRight: '1px solid #333',
+  padding: '1rem',
+  fontSize: '13px',
+};
+
+export default function ReportSidebar({
+  onConfigChange,
+  orders, onOrdersChange,
+  competitions, onCompetitionsChange,
+  citations, citationsChange, onCitationsChange, onCitationsChangeChange,
+}) {
+  return (
+    <div data-editor-only="true" style={sidebarStyle}>
+      <ConfigEditor onChange={onConfigChange} />
+
+      <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
+
+      <span style={sidebarSectionHead}>Orders</span>
+      <OrdersForm orders={orders} onChange={onOrdersChange} />
+
+      <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
+
+      <span style={sidebarSectionHead}>Competitions</span>
+      <CompetitionsForm competitions={competitions} onChange={onCompetitionsChange} />
+
+      <hr style={{ borderColor: '#333', margin: '1rem 0' }} />
+
+      <span style={sidebarSectionHead}>
+        Citations
+        <span style={{ fontWeight: 'normal', opacity: 0.7, marginLeft: '0.5em' }}>(Δ count)</span>
+      </span>
+      <CitationsForm
+        citations={citations}
+        citationsChange={citationsChange}
+        onCitationsChange={onCitationsChange}
+        onChangeChange={onCitationsChangeChange}
+      />
+    </div>
+  );
+}
+
+ReportSidebar.propTypes = {
+  onConfigChange: T.func.isRequired,
+  orders: T.arrayOf(T.object).isRequired,
+  onOrdersChange: T.func.isRequired,
+  competitions: T.arrayOf(T.object).isRequired,
+  onCompetitionsChange: T.func.isRequired,
+  citations: T.arrayOf(T.string).isRequired,
+  citationsChange: T.string.isRequired,
+  onCitationsChange: T.func.isRequired,
+  onCitationsChangeChange: T.func.isRequired,
+};

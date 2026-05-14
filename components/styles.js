@@ -71,11 +71,8 @@ const a = { color: '#0095ff' };
 const dt = { display: 'inline', fontWeight: 'bold', marginRight: '0.5em', float: 'left' };
 const dd = { margin: '0 0 0.5em 0' };
 
-// Legacy — used by old reports and backward-compat code
-const card = { padding: '1em 0.5em', borderBottom: 'solid 1px #666666', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' };
-const highlighted = { backgroundColor: '#004c83', padding: '0.5em' };
-const highlightedLink = { color: '#f49553' };
 const rankBadge = { height: '27px', display: 'inline-block', paddingRight: '0.5em' };
+const highlightedLink = { color: '#f49553' };
 
 const list = {
   listStyleType: '"- "',
@@ -118,7 +115,7 @@ const styles = {
   footer,
   h1, h2, h3, h4, h5, h6,
   p, a, dt, dd,
-  card, highlighted, highlightedLink, rankBadge,
+  rankBadge, highlightedLink,
   red, green, black, white,
   list, listItem, listItemLink, listItemLabel
 };

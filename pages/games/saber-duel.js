@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import LightsaberGame from '../../components/LightsaberGame';
+import LightsaberGame from '../../components/lightsaberGame';
 import s from '../../styles/games.module.css';
 
 const TITLE_ART = [

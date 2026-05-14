@@ -1,9 +1,10 @@
 import T from 'prop-types';
 import Link from './link';
 import styles from './styles';
-import config from '../config';
+import { useConfig } from '../src/configContext';
 
 export default function Competitions({ competitions }) {
+  const config = useConfig();
   return (
     <section id="competitions" aria-labelledby="competitions-heading" style={styles.sectionBlock}>
       <p id="competitions-heading" style={styles.sectionPrefix}>[COO] ACTIVE THEATERS</p>
