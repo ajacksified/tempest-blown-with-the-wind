@@ -41,6 +41,12 @@ const sectionHeadingStyle = {
   paddingBottom: '3px',
 };
 
+const gridStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+  gap: '0.5em',
+};
+
 function Field({ label, value, onChange, type = 'text', hint }) {
   return (
     <div style={fieldStyle}>
