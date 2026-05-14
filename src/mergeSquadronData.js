@@ -8,7 +8,12 @@
  * @returns {object} Merged config
  */
 export default function mergeSquadronData(apiResponse, baseConfig, fleetEntry = null) {
-  const { squadron, pilots = [] } = apiResponse;
+  const { squadron, pilots = [] } = apiResponse ?? {};
+
+  if (!squadron) return {
+    ...baseConfig,
+    colorHelmetBase: fleetEntry?.uniformData?.colorHelmetBase ?? baseConfig.colorHelmetBase,
+  };
 
   const cmdrPilot = pilots.find((p) => p.position === 'CMDR');
 

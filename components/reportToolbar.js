@@ -68,7 +68,7 @@ export default function ReportToolbar({
         />
       </label>
 
-      <button type="button" onClick={onLoadData} disabled={loading} style={primaryButton}>
+      <button type="button" onClick={() => onLoadData()} disabled={loading} style={primaryButton}>
         {loading ? 'Loading…' : 'Load Data'}
       </button>
 
