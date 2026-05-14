@@ -265,6 +265,8 @@ export default function ReportEditorV2() {
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <ReportSidebar
             uniformUrl={uniformUrl} onUniformUrlChange={setUniformUrl}
+            accentColor={liveConfig.colorHelmetBase ?? '#2a499c'}
+            onAccentColorChange={(c) => setLiveConfig((prev) => ({ ...prev, colorHelmetBase: c }))}
             orders={orders} onOrdersChange={setOrders}
             competitions={competitions} onCompetitionsChange={setCompetitions}
             citations={citations} citationsChange={citationsChange}
