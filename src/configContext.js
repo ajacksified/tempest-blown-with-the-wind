@@ -4,7 +4,9 @@ import staticConfig from '../config';
 export function processConfig(raw) {
   return {
     ...raw,
-    reportTitleFormat: (number) => raw.reportTitleFormat.replace('{{number}}', number),
+    reportTitleFormat: typeof raw.reportTitleFormat === 'function'
+      ? raw.reportTitleFormat
+      : (number) => String(raw.reportTitleFormat ?? '').replace('{{number}}', number),
   };
 }
 
