@@ -95,17 +95,26 @@ const CHAOS_DEFS = [
     },
   },
   {
-    id: 'fire', banner: 'FIRE DETECTED IN TANK 3',
+    id: 'fire', banner: 'FIRE DETECTED IN TANK ?',
     type: 'choice', timeout: 8,
+    onSpawn: (ev, gs) => {
+      const onlineIdxs = gs.columns.map((c, i) => c !== 'OFFLINE' ? i : -1).filter(i => i >= 0);
+      const idx = onlineIdxs.length
+        ? onlineIdxs[Math.floor(Math.random() * onlineIdxs.length)]
+        : Math.floor(Math.random() * gs.columns.length);
+      ev.tankIdx = idx;
+      ev.banner  = `FIRE DETECTED IN TANK ${idx + 1}`;
+      ev.failMsg = `No response \u2014 fire spread to Tank ${idx + 1}.`;
+    },
     choices: [
-      { key: 'foam',   label: 'FOAM',   fn: gs => { gs.impurity = Math.min(50, gs.impurity + 6); addLog(gs, '> Foam applied. Fire out. Batch fouled.'); } },
-      { key: 'vent',   label: 'VENT',   fn: gs => { gs.pressure = Math.max(0, gs.pressure - 20); addLog(gs, '> Vented. Fire out. Pressure dropped.'); } },
-      { key: 'ignore', label: 'IGNORE', fn: gs => {
+      { key: 'foam',   label: 'ADD FOAM',       fn: (gs, ev) => { gs.impurity = Math.min(50, gs.impurity + 6); addLog(gs, `> Foam applied. Tank ${ev.tankIdx + 1} fire out. Batch fouled.`); } },
+      { key: 'vent',   label: 'VENT PRESSURE',   fn: (gs, ev) => { gs.pressure = Math.max(0, gs.pressure - 20); addLog(gs, `> Vented. Tank ${ev.tankIdx + 1} fire out. Pressure dropped.`); } },
+      { key: 'ignore', label: 'IGNORE',          fn: (gs, ev) => {
         if (Math.random() < 0.55) {
           gs.explosions++;
           gs.crewPct = Math.max(0, gs.crewPct - 30);
-          gs.columns[2] = 'OFFLINE';
-          addLog(gs, '> *** EXPLOSION *** Tank 3 offline.');
+          gs.columns[ev.tankIdx] = 'OFFLINE';
+          addLog(gs, `> *** EXPLOSION *** Tank ${ev.tankIdx + 1} offline.`);
         } else {
           addLog(gs, '> Fire self-extinguished. Outstanding luck.');
         }
@@ -114,11 +123,11 @@ const CHAOS_DEFS = [
     successMsg: null,
     failMsg: 'No response \u2014 fire spread.',
     onSuccess: () => {},
-    onFail: gs => {
+    onFail: (gs, ev) => {
       gs.explosions++;
       gs.crewPct = Math.max(0, gs.crewPct - 30);
-      gs.columns[2] = 'OFFLINE';
-      addLog(gs, '> Tank 3 offline. Casualties reported.');
+      gs.columns[ev.tankIdx ?? 2] = 'OFFLINE';
+      addLog(gs, `> Tank ${(ev.tankIdx ?? 2) + 1} offline. Casualties reported.`);
     },
   },
   {
@@ -249,7 +258,7 @@ function doTick(gs) {
   if (gs.chaosEvent) {
     gs.chaosEvent.timeLeft--;
     if (gs.chaosEvent.timeLeft <= 0) {
-      gs.chaosEvent.onFail(gs);
+      gs.chaosEvent.onFail(gs, gs.chaosEvent);
       addLog(gs, `> !! ${gs.chaosEvent.failMsg}`);
       gs.chaosEvent = null;
     }
@@ -258,7 +267,9 @@ function doTick(gs) {
     if (Math.random() < chance) {
       const pool = CHAOS_DEFS.filter(e => e.id !== 'inspection' || gs.tick > 60);
       const def  = pool[Math.floor(Math.random() * pool.length)];
-      gs.chaosEvent = { ...def, timeLeft: def.timeout };
+      const ev   = { ...def, timeLeft: def.timeout };
+      if (def.onSpawn) def.onSpawn(ev, gs);
+      gs.chaosEvent = ev;
     }
   }
 
@@ -323,7 +334,7 @@ function parseCmd(raw, gs) {
   if (gs.chaosEvent && gs.chaosEvent.type === 'choice') {
     const choice = gs.chaosEvent.choices.find(c => c.key === cmd);
     if (choice) {
-      choice.fn(gs);
+      choice.fn(gs, gs.chaosEvent);
     } else {
       const valid = gs.chaosEvent.choices.map(c => c.key).join(', ');
       addLog(gs, `> UNKNOWN OPTION. Valid: ${valid}`);
