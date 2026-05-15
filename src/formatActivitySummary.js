@@ -4,10 +4,10 @@ export default function formatActivitySummary(activity) {
 
   const medals = activity.MEDALS_AWARDED ?? {};
   if (medals.LoS) {
-    parts.push(`PvE battles: ${medals.LoS} LoS${medals.LoS !== 1 ? 's' : ''} earned`);
+    parts.push(`PvE (${medals.LoS})`);
   }
   if (medals.LoC) {
-    parts.push(`PvP battles: ${medals.LoC} LoC${medals.LoC !== 1 ? 's' : ''} earned`);
+    parts.push(`PvP (${medals.LoC})`);
   }
 
   if (activity.BATTLE_COMPLETED?.length) {
