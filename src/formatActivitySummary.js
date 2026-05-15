@@ -2,6 +2,14 @@ export default function formatActivitySummary(activity) {
   if (!activity || typeof activity !== 'object') return '';
   const parts = [];
 
+  const medals = activity.MEDALS_AWARDED ?? {};
+  if (medals.LoS) {
+    parts.push(`PvE battles: ${medals.LoS} LoS${medals.LoS !== 1 ? 's' : ''} earned`);
+  }
+  if (medals.LoC) {
+    parts.push(`PvP battles: ${medals.LoC} LoC${medals.LoC !== 1 ? 's' : ''} earned`);
+  }
+
   if (activity.BATTLE_COMPLETED?.length) {
     parts.push(`Completed battles: ${activity.BATTLE_COMPLETED.map((b) => `${b.battleType} ${b.battleId}`).join(', ')}`);
   }
