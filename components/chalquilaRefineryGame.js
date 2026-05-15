@@ -98,9 +98,9 @@ const CHAOS_DEFS = [
     id: 'fire', banner: 'FIRE DETECTED IN TANK 3',
     type: 'choice', timeout: 8,
     choices: [
-      { key: 'A', label: 'FOAM',   fn: gs => { gs.impurity = Math.min(50, gs.impurity + 6); addLog(gs, '> Foam applied. Fire out. Batch fouled.'); } },
-      { key: 'B', label: 'VENT',   fn: gs => { gs.pressure = Math.max(0, gs.pressure - 20); addLog(gs, '> Vented. Fire out. Pressure dropped.'); } },
-      { key: 'C', label: 'IGNORE', fn: gs => {
+      { key: 'foam',   label: 'FOAM',   fn: gs => { gs.impurity = Math.min(50, gs.impurity + 6); addLog(gs, '> Foam applied. Fire out. Batch fouled.'); } },
+      { key: 'vent',   label: 'VENT',   fn: gs => { gs.pressure = Math.max(0, gs.pressure - 20); addLog(gs, '> Vented. Fire out. Pressure dropped.'); } },
+      { key: 'ignore', label: 'IGNORE', fn: gs => {
         if (Math.random() < 0.55) {
           gs.explosions++;
           gs.crewPct = Math.max(0, gs.crewPct - 30);
@@ -314,6 +314,19 @@ function parseCmd(raw, gs) {
       addLog(gs, `> ${gs.chaosEvent.successMsg}`);
     } else {
       addLog(gs, `> WRONG RESPONSE. Required: ${gs.chaosEvent.required}`);
+    }
+    gs.chaosEvent = null;
+    return;
+  }
+
+  // During a choice chaos event, CMD input selects an option by name
+  if (gs.chaosEvent && gs.chaosEvent.type === 'choice') {
+    const choice = gs.chaosEvent.choices.find(c => c.key === cmd);
+    if (choice) {
+      choice.fn(gs);
+    } else {
+      const valid = gs.chaosEvent.choices.map(c => c.key).join(', ');
+      addLog(gs, `> UNKNOWN OPTION. Valid: ${valid}`);
     }
     gs.chaosEvent = null;
     return;
@@ -746,10 +759,10 @@ function buildDisplay(gs, order, sessionResults, pilotName, batchNumber) {
       chaosLine([{ t: '  Enter response in CMD prompt below', c: C.dim }]);
     } else if (ev.type === 'choice') {
       ev.choices.forEach(ch => {
-        chaosLine([{ t: `  [${ch.key}]  `, c: C.amber }, { t: ch.label, c: C.white }]);
+        chaosLine([{ t: `  ${ch.key}  `, c: C.amber }, { t: `— ${ch.label}`, c: C.white }]);
       });
       chaosLine([{ t: ' ' }]);
-      chaosLine([{ t: '  Press A, B, or C key to respond', c: C.dim }]);
+      chaosLine([{ t: '  Enter command in CMD prompt below', c: C.dim }]);
     }
 
     chaosLine([{ t: ' ' }]);
@@ -995,20 +1008,8 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
     return () => clearInterval(interval);
   }, [prePhase, order, render]);
 
-  // Keydown: A/B/C for choice-type chaos events
-  const handleKeyDown = useCallback(e => {
-    const gs = gsRef.current;
-    if (!gs || !gs.chaosEvent || gs.chaosEvent.type !== 'choice' || prePhase !== null) return;
-    const key = e.key.toUpperCase();
-    const choice = gs.chaosEvent.choices.find(c => c.key === key);
-    if (choice) {
-      e.preventDefault();
-      choice.fn(gs);
-      gs.chaosEvent = null;
-      render();
-      inputRef.current?.focus();
-    }
-  }, [render, prePhase]);
+  // Keydown: no longer used for choice events (handled via CMD prompt)
+  const handleKeyDown = useCallback(_e => {}, []);
 
   useEffect(() => {
     return () => window.removeEventListener('keydown', handleKeyDown);
