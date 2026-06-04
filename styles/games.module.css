@@ -143,6 +143,7 @@
   color: var(--amber);
   margin: 0 0 1.5rem 0;
   line-height: 1.35;
+  overflow-x: auto;
 }
 
 .missionTextAmber {
@@ -210,5 +211,41 @@
   color: var(--amber);
   margin: 0 0 1rem 0;
   line-height: 1.4;
+  overflow-x: auto;
+}
+
+/* ── Mobile / small-screen responsive styles ── */
+
+/* Tablets and large phones (≤ 700px) */
+@media (max-width: 700px) {
+  .titlePreAmber {
+    font-size: 9px;
+  }
+
+  .debriefPre {
+    font-size: 10px;
+  }
+}
+
+/* Small phones (≤ 430px) — tighten further to fit 66-char art in ~343px content area */
+@media (max-width: 430px) {
+  .titlePreAmber {
+    font-size: 8px;
+  }
+
+  .debriefPre {
+    font-size: 8px;
+  }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width: 360px) {
+  .titlePreAmber {
+    font-size: 7px;
+  }
+
+  .debriefPre {
+    font-size: 7px;
+  }
 }
 
