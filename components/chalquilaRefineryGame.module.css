@@ -87,7 +87,7 @@
   }
 
   .cmdInput {
-    font-size: 10px;
+    font-size: 16px; /* ≥ 16px prevents iOS Safari auto-zoom on focus */
     width: min(420px, calc(100vw - 80px));
   }
 
@@ -112,7 +112,7 @@
   }
 
   .cmdInput {
-    font-size: 8.5px;
+    font-size: 16px; /* keep ≥ 16px to prevent iOS zoom */
     width: calc(100vw - 75px);
   }
 
@@ -132,7 +132,7 @@
   }
 
   .cmdInput {
-    font-size: 7.5px;
+    font-size: 16px; /* keep ≥ 16px to prevent iOS zoom */
     width: calc(100vw - 70px);
   }
 
