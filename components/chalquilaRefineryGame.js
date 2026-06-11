@@ -677,7 +677,7 @@ function getHint(gs, order) {
 
   // Positive confirmation when on track
   if (eth >= profile.proofMin && meth <= profile.toxMax * 0.5 && gs.impurity < 12) {
-    return 'Batch on track. Hold conditions and watch for chaos events.';
+    return 'Batch on track. Hold conditions and watch for chaos events';
   }
 
   return null;
@@ -1055,7 +1055,7 @@ export default function ChalquilaRefineryGame({ order, onComplete, sessionResult
           className={styles.cmdInput}
           onKeyDown={handleCmdKey}
           autoFocus
-          placeholder="type command…"
+          placeholder="type command..."
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"

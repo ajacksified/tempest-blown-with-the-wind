@@ -102,7 +102,7 @@ function Toolbar({ onCmd, onLinkCommit, linkMode, setLinkMode, linkRef }) {
           <input
             ref={linkRef}
             type="url"
-            placeholder="https://…"
+            placeholder="https://..."
             style={linkInputStyle}
             onKeyDown={(e) => {
               if (e.key === 'Enter') { e.preventDefault(); onLinkCommit(linkRef.current.value); }

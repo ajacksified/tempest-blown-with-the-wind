@@ -59,7 +59,7 @@ export default function ReportSidebar({
         type="url"
         value={uniformUrl}
         onChange={(e) => onUniformUrlChange(e.target.value)}
-        placeholder="https://…"
+        placeholder="https://..."
         style={inputStyle}
       />
 
